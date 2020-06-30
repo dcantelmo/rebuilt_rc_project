@@ -1,6 +1,4 @@
 const { rooms, checkRoom } = require("./roomArray");
-const { response } = require("express");
-const room = require("../../router/client/routes/room");
 
 module.exports = (io) => {
     io.on("connection", (socket) => {
@@ -26,7 +24,6 @@ module.exports = (io) => {
 
         socket.on("join", (data) => {
             socket.room = data.id;
-            console.log(typeof (checkRoom));
             if (checkRoom(data.id, data.password) == "ok")
                 socket.join(data.id);
             else

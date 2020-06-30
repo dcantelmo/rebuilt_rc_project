@@ -56,7 +56,7 @@ Vue.component('Vuecanvas', {
     methods: {
         subscription() {
             if (this.mode === 'watch') {
-                tohis.socket.on("getImageState", ((data) => {
+                this.socket.on("getImageState", ((data) => {
                     this.history = data.history;
                     this.context.clearRect(0, 0, this.width, this.height);
                     for (stroke in data.history)
@@ -311,7 +311,7 @@ var app = new Vue({
             password: this.pass,
         };
         this.socket.on('seistronzo', () => {
-            window.location.replace("https://www.google.com/");
+            window.location.replace("https://youtu.be/dQw4w9WgXcQ");
         })
         this.socket.on('timerEvent', ((data) => {
             this.timer = data;

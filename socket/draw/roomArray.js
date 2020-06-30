@@ -1,5 +1,3 @@
-const { io } = require("../index.js");
-
 var rooms = {};
 
 class Room {
@@ -60,8 +58,7 @@ class Room {
     start() {
         var interval = setInterval(
             (() => {
-                console.log(this.io);
-                this.io.broadcast.to(this.id).emit("getTime", this.timer);
+                this.io.to(this.id).emit("timerEvent", this.timer);
                 if (this.timer <= 0) clearInterval(interval);
                 else this.timer--;
             }).bind(this),
@@ -72,7 +69,7 @@ class Room {
 
 module.exports = {
     rooms,
-    createRoom(id, password) {
+    createRoom(id, password, io) {
         rooms[id] = new Room(id, password, io);
         return id;
     },

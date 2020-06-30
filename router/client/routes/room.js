@@ -4,6 +4,8 @@ const {
     createRoom,
     checkRoom,
 } = require("../../../socket/draw/roomArray");
+const {io} = require("../../../socket")
+
 
 module.exports = (app) => {
     app.use("/room", router);
@@ -32,7 +34,7 @@ module.exports = (app) => {
             else if (checkRoom(req.body.id, req.body.password) == "password") {
                 res.redirect(`/room?err=password&roomName=${req.body.id}`);
             } else {
-                createRoom(req.body.id, req.body.password);
+                createRoom(req.body.id, req.body.password, io);
                 res.render("draw/draw", {
                     ROOM: req.body.id,
                     PASSWORD: req.body.password

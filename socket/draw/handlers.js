@@ -26,8 +26,11 @@ module.exports = (io) => {
 
         socket.on("join", (data) => {
             socket.room = data.id;
-            if (checkRoom(data.id, data.password) == "ok") socket.join(data.id);
-            else socket.emit("seistronzo");
+            console.log(typeof (checkRoom));
+            if (checkRoom(data.id, data.password) == "ok")
+                socket.join(data.id);
+            else
+                socket.emit("seistronzo");
         });
 
         socket.on("startGame", () => {

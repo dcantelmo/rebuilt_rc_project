@@ -1,4 +1,4 @@
-const {io} = require("../index.j");
+const { io } = require("../index.js");
 
 var rooms = {};
 
@@ -60,7 +60,7 @@ class Room {
     start() {
         var interval = setInterval(
             (() => {
-                console.log(this.io)
+                console.log(this.io);
                 this.io.broadcast.to(this.id).emit("getTime", this.timer);
                 if (this.timer <= 0) clearInterval(interval);
                 else this.timer--;
@@ -77,11 +77,11 @@ module.exports = {
         return id;
     },
     checkRoom(id, password) {
-        if(rooms[id]){
+        if (rooms[id]) {
             //corrisponde ID
             if (rooms[id].password == password) return "ok";
             //password errata
-            else return "password"; 
-        }else return "notExist"; //
+            else return "password";
+        } else return "notExist";
     },
 };

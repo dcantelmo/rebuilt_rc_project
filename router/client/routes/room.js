@@ -3,7 +3,6 @@ const router = Router();
 const {
     createRoom,
     checkRoom,
-    rooms,
 } = require("../../../socket/draw/roomArray");
 
 module.exports = (app) => {

@@ -1,4 +1,4 @@
-const {io} = require("../index.js");
+const {io} = require("../index.j");
 
 var rooms = {};
 

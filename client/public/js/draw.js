@@ -297,11 +297,25 @@ var app = new Vue({
     data: {
         socket: '',
         canvasMode: 'drawer',
+        room: '',
+        pass: ''
     },
     beforeMount: function () {
         this.room = this.$el.attributes['room'].value
+        this.pass = this.$el.attributes['pass'].value
         this.socket = io('http://localhost:4000');
     },
+    mounted() { 
+        let data = {
+            id: this.room,
+            password: this.pass,
+        };
+        this.socket.on('seistronzo', () => {
+            window.location.replace('www.google.com');
+        })
+        this.socket.emit('join', data);
+    },
+    
     methods: {
         change() {
             if (this.canvasMode == 'drawer')

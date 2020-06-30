@@ -10,7 +10,7 @@ async function startServer() {
     await require('./socket').init(server);
     console.log('Socket initialized');
 
-    server.listen(config.port, err => {
+    server.listen(config.port, config.serverURI, err => {
         if (err) {
             console.log('error')
             process.exit(1);

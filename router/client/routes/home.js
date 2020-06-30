@@ -9,7 +9,7 @@ module.exports = (app) => {
         res.render("home/home", {
           client_name: req.connection.remoteAddress,
           players: [{ name: "Daniele" }, { name: "Capo" }, { name: "Sandro" }],
-          play_link: `/`,
+          play_link: `/room`,
         });
     })
 

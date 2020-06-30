@@ -8,9 +8,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 </head>
 <body>
-    <div id="app" room="<%= ROOM %>">
+    <div id="app" room="<%= ROOM %>" pass="<%= PASSWORD %>">
         <Vuecanvas v-if="socket" :mode="canvasMode" :key="canvasMode" :socket="socket"></Vuecanvas>
         <button @click="change()">{{canvasMode}}</button>
+        
     </div>
     <script src="/public/js/draw.js"></script>
 </body>

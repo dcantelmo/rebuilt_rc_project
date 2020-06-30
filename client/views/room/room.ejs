@@ -27,19 +27,8 @@
         <br />
         <h2>Accedi o crea una room</h2>
         <form action="<%= room_link %>" method="POST" name="form">
-            <input
-                type="text"
-                size="20"
-                maxlength="10"
-                name="id"
-                placeholder="Room Name"
-            />
-            <input
-                type="password"
-                size="20"
-                name="password"
-                placeholder="Insert room password"
-            />
+            <input type="text" size="20" maxlength="10" name="id" placeholder="Room Name" />
+            <input type="password" size="20"  name="password"  placeholder="Insert room password"/>
             <input type="submit" value="invia" />
         </form>
         <%if (error) { %>

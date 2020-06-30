@@ -56,7 +56,7 @@ Vue.component('Vuecanvas', {
     methods: {
         subscription() {
             if (this.mode === 'watch') {
-                this.socket.on("getImageState", ((data) => {
+                tohis.socket.on("getImageState", ((data) => {
                     this.history = data.history;
                     this.context.clearRect(0, 0, this.width, this.height);
                     for (stroke in data.history)
@@ -290,15 +290,15 @@ Vue.component('Vuecanvas', {
     }
 })
 
-
-
 var app = new Vue({
     el: '#app',
     data: {
         socket: '',
         canvasMode: 'drawer',
         room: '',
-        pass: ''
+        pass: '',
+        timer: '',
+        match_start: false,
     },
     beforeMount: function () {
         this.room = this.$el.attributes['room'].value
@@ -311,8 +311,12 @@ var app = new Vue({
             password: this.pass,
         };
         this.socket.on('seistronzo', () => {
-            window.location.replace('www.google.com');
+            window.location.replace("https://www.google.com/");
         })
+        this.socket.on('timerEvent', ((data) => {
+            this.timer = data;
+        }).bind(this));
+        
         this.socket.emit('join', data);
     },
     
@@ -322,6 +326,12 @@ var app = new Vue({
                 this.canvasMode = 'watch'
             else
                 this.canvasMode = 'drawer';
+        },
+        start(e) {
+            if (!this.match_start) {
+                this.socket.emit('startGame');
+                e.target.disabled = true;
+            }
         }
     }
 })

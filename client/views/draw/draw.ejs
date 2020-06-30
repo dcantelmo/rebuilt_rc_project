@@ -11,6 +11,8 @@
     <div id="app" room="<%= ROOM %>" pass="<%= PASSWORD %>">
         <Vuecanvas v-if="socket" :mode="canvasMode" :key="canvasMode" :socket="socket"></Vuecanvas>
         <button @click="change()">{{canvasMode}}</button>
+        <button id='start' @click="start($event)">Start</button>
+        <h4>Timer: {{timer}}</h4>
         
     </div>
     <script src="/public/js/draw.js"></script>

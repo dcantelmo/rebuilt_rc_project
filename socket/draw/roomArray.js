@@ -1,4 +1,6 @@
-var rooms = [];
+const {io} = require("../index.js");
+
+var rooms = {};
 
 class Room {
     constructor(id, password, io) {
@@ -58,7 +60,8 @@ class Room {
     start() {
         var interval = setInterval(
             (() => {
-                this.io.broadcast.to[this.id].emit("getTime", this.timer);
+                console.log(this.io)
+                this.io.broadcast.to(this.id).emit("getTime", this.timer);
                 if (this.timer <= 0) clearInterval(interval);
                 else this.timer--;
             }).bind(this),
@@ -69,7 +72,7 @@ class Room {
 
 module.exports = {
     rooms,
-    createRoom(id, password, io) {
+    createRoom(id, password) {
         rooms[id] = new Room(id, password, io);
         return id;
     },

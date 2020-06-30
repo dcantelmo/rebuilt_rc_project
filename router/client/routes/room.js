@@ -1,6 +1,5 @@
 const { Router } = require("express");
 const router = Router();
-const { io } = require("../../../socket");
 const {
     createRoom,
     checkRoom,
@@ -24,16 +23,6 @@ module.exports = (app) => {
         }
     });
 
-    router.get("/prova", (req, res) => {
-        getRoom();
-        res.send("ok");
-    });
-
-    router.get("/result", (req, res) => {
-        prova();
-        res.send("ok");
-    });
-
     router.post("/draw", (req, res) => {
         if (req.body) {
             if (checkRoom(req.body.id, req.body.password) == "ok")
@@ -44,7 +33,7 @@ module.exports = (app) => {
             else if (checkRoom(req.body.id, req.body.password) == "password") {
                 res.redirect(`/room?err=password&roomName=${req.body.id}`);
             } else {
-                createRoom(req.body.id, req.body.password, io);
+                createRoom(req.body.id, req.body.password);
                 res.render("draw/draw", {
                     ROOM: req.body.id,
                     PASSWORD: req.body.password

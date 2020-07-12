@@ -1,0 +1,11 @@
+.message-box{
+    height: 20vh;
+    width: 50vw;
+    overflow: auto;
+    overflow-wrap: break-word;
+    border: solid 2px lightcoral;   
+}
+
+.message {
+    
+}

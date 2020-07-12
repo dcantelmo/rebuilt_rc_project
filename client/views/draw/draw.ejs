@@ -6,14 +6,15 @@
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-</head>
+    <link rel="stylesheet" href="/public/css/draw.css">
 <body>
     <div id="app" room="<%= ROOM %>" pass="<%= PASSWORD %>">
+        <Vueword :socket="socket"></Vueword>
         <Vuecanvas v-if="socket" :mode="canvasMode" :key="canvasMode" :socket="socket"></Vuecanvas>
         <button @click="change()">{{canvasMode}}</button>
         <button id='start' @click="start($event)">Start</button>
         <h4>Timer: {{timer}}</h4>
-        
+        <Vuechat :socket="socket" />
     </div>
     <script src="/public/js/draw.js"></script>
 </body>

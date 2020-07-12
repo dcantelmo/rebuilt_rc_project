@@ -1,16 +1,16 @@
-Vue.component('Vuecanvas', {
+Vue.component("Vuecanvas", {
     template: `<canvas :style="{cursor: selectedCursor}" ref="v-canvas" :width="width" :height="height"></canvas>`,
     props: {
         width: {
-            default: 300
+            default: 300,
         },
         height: {
-            default: 300
+            default: 300,
         },
         mode: {
-            default: 'offline'
+            default: "offline",
         },
-        socket: ''
+        socket: "",
     },
     data() {
         return {
@@ -20,7 +20,7 @@ Vue.component('Vuecanvas', {
             history: [], //Vettore che conserva tutti i tratti effettuati
             point: {
                 x: Number,
-                y: Number
+                y: Number,
             },
             lastStrokeHistory: [0],
             selectedColor: "",
@@ -38,16 +38,15 @@ Vue.component('Vuecanvas', {
                 brown: "#994e1c",
                 beige: "#f0ba69",
                 black: "#000000",
-                white: "#ffffff"
+                white: "#ffffff",
             },
             //Online Variables
             //Drawer
             buffer: [],
-
         };
     },
     mounted() {
-        console.log()
+        console.log();
         this.setCanvas();
         if (this.mode === "drawer" || this.mode === "offline")
             this.bindEvents();
@@ -55,38 +54,50 @@ Vue.component('Vuecanvas', {
     },
     methods: {
         subscription() {
-            if (this.mode === 'watch') {
-                this.socket.on("getImageState", ((data) => {
-                    this.history = data.history;
-                    this.context.clearRect(0, 0, this.width, this.height);
-                    for (stroke in data.history)
-                        this._redraw(stroke);
-                }).bind(this));
+            if (this.mode === "watch") {
+                this.socket.on(
+                    "getImageState",
+                    ((data) => {
+                        this.history = data.history;
+                        this.context.clearRect(0, 0, this.width, this.height);
+                        for (stroke in data.history) this._redraw(stroke);
+                    }).bind(this)
+                );
 
-                this.socket.on("strokes", ((strokes) => {
-                    strokes.forEach(stroke => {
-                        this.history.push(stroke);
-                        this._redraw(stroke);
-                    })
+                this.socket.on(
+                    "strokes",
+                    ((strokes) => {
+                        strokes.forEach((stroke) => {
+                            this.history.push(stroke);
+                            this._redraw(stroke);
+                        });
+                    }).bind(this)
+                );
 
-                }).bind(this));
+                this.socket.on(
+                    "clearDrawing",
+                    (() => {
+                        this.clear();
+                    }).bind(this)
+                );
 
-                this.socket.on("clearDrawing", (() => {
-                    this.clear();
-                }).bind(this))
-
-                this.socket.on("redraw", ((lastHistory) => {
-                    this.lastStrokeHistory = [0];
-                    for (let i = 0; i < lastHistory.length; i++) {
-                        this.lastStrokeHistory.push(lastHistory[i]);
-                    }
-                    this.redraw();
-                }).bind(this))
-            }
-            else if (this.mode === 'drawer') {
-                this.socket.on("getImageState", (() => {
-                    this.socket.emit("imageState", this.history);
-                }).bind(this))
+                this.socket.on(
+                    "redraw",
+                    ((lastHistory) => {
+                        this.lastStrokeHistory = [0];
+                        for (let i = 0; i < lastHistory.length; i++) {
+                            this.lastStrokeHistory.push(lastHistory[i]);
+                        }
+                        this.redraw();
+                    }).bind(this)
+                );
+            } else if (this.mode === "drawer") {
+                this.socket.on(
+                    "getImageState",
+                    (() => {
+                        this.socket.emit("imageState", this.history);
+                    }).bind(this)
+                );
 
                 setInterval(this.dispatcher, 20);
             }
@@ -96,23 +107,26 @@ Vue.component('Vuecanvas', {
                 const temp = this.buffer.map((x) => x);
                 for (let i = 0; i < temp.length; i++) {
                     switch (temp[i].action) {
-                        case 'strokes':
+                        case "strokes":
                             let strokes = [];
                             strokes.push(temp[i].stroke);
-                            while (temp[i + 1] && temp[i + 1].action === 'strokes') {
+                            while (
+                                temp[i + 1] &&
+                                temp[i + 1].action === "strokes"
+                            ) {
                                 strokes.push(temp[++i].stroke);
                             }
-                            this.socket.emit('strokes', strokes);
+                            this.socket.emit("strokes", strokes);
                             console.log(strokes);
                             break;
-                        case 'clear':
-                            this.socket.emit('clearDrawing');
+                        case "clear":
+                            this.socket.emit("clearDrawing");
                             break;
-                        case 'redraw':
-                            this.socket.emit('redraw', temp[i].lastHistory);
+                        case "redraw":
+                            this.socket.emit("redraw", temp[i].lastHistory);
                             break;
                         default:
-                            console.log('azione non riconosciuta :(');
+                            console.log("azione non riconosciuta :(");
                     }
                 }
                 this.buffer.splice(0, temp.length);
@@ -125,12 +139,12 @@ Vue.component('Vuecanvas', {
                 strokeWidth: this.context.lineWidth,
                 from: {
                     x: this.point.x,
-                    y: this.point.y
+                    y: this.point.y,
                 },
                 to: {
                     x: eventPoint.offsetX,
-                    y: eventPoint.offsetY
-                }
+                    y: eventPoint.offsetY,
+                },
             };
         },
         setCanvas() {
@@ -149,7 +163,7 @@ Vue.component('Vuecanvas', {
             this.context.lineJoin = "round";
         },
         bindEvents() {
-            this.$refs["v-canvas"].addEventListener("mousedown", event => {
+            this.$refs["v-canvas"].addEventListener("mousedown", (event) => {
                 if (window.getSelection().focusNode != null) {
                     window.getSelection().removeAllRanges();
                 }
@@ -173,7 +187,7 @@ Vue.component('Vuecanvas', {
                     this.lastStrokeHistory.push(this.history.length);
                 }
             });
-            this.$refs["v-canvas"].addEventListener("wheel", e => {
+            this.$refs["v-canvas"].addEventListener("wheel", (e) => {
                 e.preventDefault();
                 if (e.deltaY <= -1) {
                     //Movimento rotellina in su
@@ -208,9 +222,11 @@ Vue.component('Vuecanvas', {
         redraw() {
             //Funzione per il tasto "indietro", ridisegna i tratti tranne l'ultimo
             if (this.lastStrokeHistory.length < 2) return;
-            if (this.mode === 'drawer') {
-                this.buffer.push({ action: 'redraw', lastHistory: [...this.lastStrokeHistory] });
-
+            if (this.mode === "drawer") {
+                this.buffer.push({
+                    action: "redraw",
+                    lastHistory: [...this.lastStrokeHistory],
+                });
             }
             let index = this.lastStrokeHistory[
                 this.lastStrokeHistory.length - 2
@@ -219,7 +235,7 @@ Vue.component('Vuecanvas', {
             this.context.clearRect(0, 0, this.width, this.height);
             this.history.length = index;
             this.lastStrokeHistory.pop();
-            this.history.forEach(stroke => this._redraw(stroke));
+            this.history.forEach((stroke) => this._redraw(stroke));
             this.context.globalCompositeOperation = this.currentOperation;
             this.context.strokeStyle = this.selectedColor;
             this.context.lineWidth = this.lineWidth;
@@ -243,13 +259,12 @@ Vue.component('Vuecanvas', {
                 this.context.stroke();
                 [this.point.x, this.point.y] = [stroke.to.x, stroke.to.y];
                 this.history.push(stroke);
-                if (this.mode === 'drawer')
-                    this.buffer.push({ action: 'strokes', stroke: stroke });
+                if (this.mode === "drawer")
+                    this.buffer.push({ action: "strokes", stroke: stroke });
             }
         },
         clear() {
-            if (this.mode === 'drawer')
-                this.buffer.push({ action: 'clear' });
+            if (this.mode === "drawer") this.buffer.push({ action: "clear" });
             this.context.clearRect(0, 0, this.width, this.height);
             this.lastStrokeHistory = [0];
             this.history = [];
@@ -267,7 +282,7 @@ Vue.component('Vuecanvas', {
             this.context.lineTo(stroke.to.x, stroke.to.y);
             this.context.stroke();
             this.history.push(stroke);
-        }
+        },
 
         //DRAWER ONLY
     },
@@ -276,62 +291,128 @@ Vue.component('Vuecanvas', {
             //Cursore dinamico
             return `url("data:image/svg+xml,%3Csvg width='32' height='32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Cellipse opacity='${
                 this.isDrawing ? "1" : "0.3"
-                }' stroke='%23000' ry='15' rx='15' id='svg_2' cy='16' cx='16' stroke-opacity='null' stroke-width='2' fill='none'/%3E%3Cellipse ry='${this
-                    .lineWidth / 2}' rx='${this.lineWidth /
-                    2}' id='svg_3' cy='16' cx='16' opacity='${
+            }' stroke='%23000' ry='15' rx='15' id='svg_2' cy='16' cx='16' stroke-opacity='null' stroke-width='2' fill='none'/%3E%3Cellipse ry='${
+                this.lineWidth / 2
+            }' rx='${this.lineWidth / 2}' id='svg_3' cy='16' cx='16' opacity='${
                 this.isDrawing ? "1" : "0.3"
-                }' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3C/g%3E%3C/svg%3E") 16 16, pointer`;
+            }' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3C/g%3E%3C/svg%3E") 16 16, pointer`;
         },
         fillSelector() {
             if (this.currentOperation == "source-over")
                 return `%23${this.selectedColor.substring(1)}`;
             else return "none";
+        },
+    },
+});
+
+Vue.component("Vueword", {
+    template: `<div>{{laparola}}</div>`,
+    props: {
+        socket: ''
+    },
+    data() {
+        return {
+            laparola: ''
         }
+    },
+    mounted() {
+        this.socket.on("word", (data) => {
+            this.laparola = data;
+        })
     }
 })
 
+Vue.component("Vuechat", {
+    template: `<div>
+            <div class="message-box" id="messageBox">
+                <div v-for="(message, index) in messages" :key="index" class="message">
+                    {{message.user}}: {{message.text}}
+                </div>
+            </div>
+            <input type="text" @keydown="send($event)"/>
+        </div>`,
+    props: {
+        socket: "",
+    },
+    data() {
+        return {
+            messages: [],
+        };
+    },
+    mounted() {
+        this.socket.on("message", (data) => {
+            this.messages.push(data);
+            this.$nextTick(() => {
+                let box = document.getElementById("messageBox");
+                
+                    this.updateScroll();
+               
+            })
+        });
+    },
+    methods: {
+        send(e) {
+            if (e.keyCode == 13) {
+                if (e.target.value) {
+                    let data = e.target.value;
+                    this.socket.emit("message", data);
+                    e.target.value = "";
+                }
+            }
+        },
+
+        updateScroll() {
+            let element = document.getElementById("messageBox");
+            if ((element.scrollHeight - element.clientHeight - element.scrollTop < 60)) { 
+                element.scrollTop = element.scrollHeight;
+            }
+        },
+    },
+});
+
 var app = new Vue({
-    el: '#app',
+    el: "#app",
     data: {
-        socket: '',
-        canvasMode: 'drawer',
-        room: '',
-        pass: '',
-        timer: '',
+        socket: "",
+        canvasMode: "drawer",
+        room: "",
+        pass: "",
+        timer: "",
         match_start: false,
     },
     beforeMount: function () {
-        this.room = this.$el.attributes['room'].value
-        this.pass = this.$el.attributes['pass'].value
-        this.socket = io('http://localhost:4000');
+        this.room = this.$el.attributes["room"].value;
+        this.pass = this.$el.attributes["pass"].value;
+        this.socket = io("http://localhost:4000");
     },
-    mounted() { 
+    mounted() {
         let data = {
             id: this.room,
             password: this.pass,
         };
-        this.socket.on('seistronzo', () => {
+        this.socket.on("seistronzo", () => {
             window.location.replace("https://youtu.be/dQw4w9WgXcQ");
-        })
-        this.socket.on('timerEvent', ((data) => {
-            this.timer = data;
-        }).bind(this));
-        
-        this.socket.emit('join', data);
+        });
+        this.socket.on(
+            "timerEvent",
+            ((data) => {
+                this.timer = data;
+            }).bind(this)
+        );
+
+        this.socket.emit("join", data);
     },
-    
+
     methods: {
         change() {
-            if (this.canvasMode == 'drawer')
-                this.canvasMode = 'watch'
-            else
-                this.canvasMode = 'drawer';
+            if (this.canvasMode == "drawer") this.canvasMode = "watch";
+            else this.canvasMode = "drawer";
         },
         start(e) {
             if (!this.match_start) {
-                this.socket.emit('startGame');
+                this.socket.emit("startGame");
                 e.target.disabled = true;
             }
-        }
-    }
-})
+        },
+    },
+});

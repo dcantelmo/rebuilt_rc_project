@@ -24,10 +24,14 @@ module.exports = (io) => {
 
         socket.on("join", (data) => {
             socket.room = data.id;
-            if (checkRoom(data.id, data.password) == "ok")
+            if (checkRoom(data.id, data.password) == "ok") {
                 socket.join(data.id);
-            else
+                rooms[socket.room].addUser(socket.id);
+            }
+            else {
                 socket.emit("seistronzo");
+                socket.room = '';
+            }
         });
 
         socket.on("startGame", () => {
@@ -37,6 +41,24 @@ module.exports = (io) => {
 
         socket.on("disconnect", () => {
             console.log("disconnected" + socket.id);
+            if (socket.room && rooms[socket.room])
+                rooms[socket.room].removeUser(socket.id);
         });
+
+        //CHAT AREA
+
+        socket.on("message", (data) => {
+            if (data == rooms[socket.room].word) {
+                console.log('ha vinto tutto: ' + socket.id);
+                return;
+            }
+
+            let package = {
+                user: socket.id,
+                text: data,
+            };
+
+            io.to(socket.room).emit("message", package);
+        })
     });
 };

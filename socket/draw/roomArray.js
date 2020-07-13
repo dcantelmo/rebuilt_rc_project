@@ -7,16 +7,15 @@ class Room {
         this.id = id;
         this.password = password;
         this.users = [];
-        this.drawer = {
-            id: "",
-            position: 0,
-        };
+        this.drawer = null;
         this.io = io;
-        this.timer = 90;
+        this.timer = 20;
         this.round = 3;
+        this.running = false;
         this.ended = false;
         this.empty = false;
         this.word = 'prova';
+        this.interval = null;
     }
     addUser(user) {
         this.users.push({
@@ -30,6 +29,8 @@ class Room {
         for (let i = 0; i < this.users.length; i++) {
             if (this.users[i].id == user) {
                 this.users.splice(i, 1);
+                if (this.users.length <= 0)
+                    this.empty = true;
                 if (
                     user == this.drawer.id &&
                     this.drawer.position >= this.users.length
@@ -61,19 +62,32 @@ class Room {
         return winner;
     }
     start() {
-        getRandomWord.random().then((word) => this.word = word).then(() => {
-            this.assignDrawer();
-            console.log(this.word);
-            console.log(this.drawer);
-            this.io.to(this.drawer.id).emit("word", this.word);
-            var interval = setInterval(
-            (() => {
-                this.io.to(this.id).emit("timerEvent", this.timer);
-                if (this.timer <= 0) clearInterval(interval);
-                else this.timer--;
-            }).bind(this),
-            1000
-        );});
+        if (!this.running && this.round > 0) {
+            getRandomWord.random().then((word) => this.word = word).then(() => {
+                this.running = true;
+                if (this.ended) {
+                    this.assignDrawer();
+                    this.ended = false;
+                }
+                console.log(this.word);
+                console.log(this.drawer);
+                this.io.to(this.drawer.id).emit("word", this.word);
+                this.interval = setInterval(
+                    (() => {
+                        this.io.to(this.id).emit("timerEvent", this.timer);
+                        if (this.timer <= 0) {
+                            this.ended = true;
+                            this.timer = 90;
+                            this.round--;
+                            this.running = false;                            
+                            clearInterval(this.interval);
+                        }
+                        else this.timer--;
+                    }).bind(this),
+                    1000
+                );
+            });
+        }
     }
 }
 

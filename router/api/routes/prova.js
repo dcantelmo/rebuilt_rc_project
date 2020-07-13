@@ -1,7 +1,6 @@
 const { Router } = require('express');
 const axios = require('axios');
 const getRandomWord = require('../../../randomWord');
-const unirest = require('unirest')
 //middlewares
 fs = require('fs')
 const router = Router();

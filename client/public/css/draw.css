@@ -2,10 +2,6 @@
     height: 20vh;
     width: 50vw;
     overflow: auto;
-    overflow-wrap: break-word;
+    word-break: break-all;
     border: solid 2px lightcoral;   
-}
-
-.message {
-    
 }

@@ -2,9 +2,7 @@ const { rooms, checkRoom } = require("./roomArray");
 
 module.exports = (io) => {
     io.on("connection", (socket) => {
-        console.log(
-            "Connected: " + socket.id + " " + socket.handshake.query.room
-        );
+        console.log("Connected: " + socket.id);
 
         socket.on("strokes", (data) => {
             socket.broadcast.to(socket.room).emit("strokes", data);
@@ -29,20 +27,29 @@ module.exports = (io) => {
                 rooms[socket.room].addUser(socket.id);
             }
             else {
-                socket.emit("seistronzo");
+                socket.emit("notExists");
                 socket.room = '';
             }
         });
 
         socket.on("startGame", () => {
             console.log(`Avvio game in room: ${socket.room}`);
-            rooms[socket.room].start();
+            if(socket.room && rooms[socket.room])
+                rooms[socket.room].start();
         });
 
         socket.on("disconnect", () => {
             console.log("disconnected" + socket.id);
-            if (socket.room && rooms[socket.room])
+            if (socket.room && rooms[socket.room]) {
                 rooms[socket.room].removeUser(socket.id);
+                console.log('andato');
+                if (rooms[socket.room].empty) {
+                    if (rooms[socket.room].interval)
+                        clearInterval(rooms[socket.room].interval)
+                    delete rooms[socket.room];
+                }
+            }
+
         });
 
         //CHAT AREA

@@ -214,8 +214,9 @@ Vue.component("Vuecanvas", {
             });
         },
         setColor(color) {
+            let reg = /#[0-9A-Fa-f]{6}/;
             this.selectedColor = color;
-            if (this.selectedColor)
+            if (!this.selectedColor && this.selectedColor.match(reg))
                 this.context.strokeStyle = this.selectedColor = "#000000";
             else this.context.strokeStyle = this.selectedColor;
         },
@@ -379,6 +380,8 @@ var app = new Vue({
         pass: "",
         timer: "",
         match_start: false,
+        canvas: "",
+        palette: ""
     },
     beforeMount: function () {
         this.room = this.$el.attributes["room"].value;
@@ -386,12 +389,13 @@ var app = new Vue({
         this.socket = io("http://localhost:4000");
     },
     mounted() {
+        this.canvas = this.$refs['myCanvas']
         let data = {
             id: this.room,
             password: this.pass,
         };
-        this.socket.on("seistronzo", () => {
-            window.location.replace("https://youtu.be/dQw4w9WgXcQ");
+        this.socket.on("notExists", () => {
+            window.location.replace("http://localhost:4000/room");
         });
         this.socket.on(
             "timerEvent",
@@ -407,6 +411,7 @@ var app = new Vue({
         change() {
             if (this.canvasMode == "drawer") this.canvasMode = "watch";
             else this.canvasMode = "drawer";
+            
         },
         start(e) {
             if (!this.match_start) {
@@ -414,5 +419,8 @@ var app = new Vue({
                 e.target.disabled = true;
             }
         },
+        changeColor(e) {
+            this.canvas.setColor(e.target.value);
+        }
     },
 });

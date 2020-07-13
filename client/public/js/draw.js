@@ -46,7 +46,6 @@ Vue.component("Vuecanvas", {
         };
     },
     mounted() {
-        console.log();
         this.setCanvas();
         if (this.mode === "drawer" || this.mode === "offline")
             this.bindEvents();
@@ -345,9 +344,7 @@ Vue.component("Vuechat", {
             this.messages.push(data);
             this.$nextTick(() => {
                 let box = document.getElementById("messageBox");
-                
                     this.updateScroll();
-               
             })
         });
     },
@@ -361,7 +358,6 @@ Vue.component("Vuechat", {
                 }
             }
         },
-
         updateScroll() {
             let element = document.getElementById("messageBox");
             if ((element.scrollHeight - element.clientHeight - element.scrollTop < 60)) { 
@@ -386,10 +382,10 @@ var app = new Vue({
     beforeMount: function () {
         this.room = this.$el.attributes["room"].value;
         this.pass = this.$el.attributes["pass"].value;
+        this.canvas = this.$refs['myCanvas']
         this.socket = io("http://localhost:4000");
     },
     mounted() {
-        this.canvas = this.$refs['myCanvas']
         let data = {
             id: this.room,
             password: this.pass,
@@ -409,9 +405,11 @@ var app = new Vue({
 
     methods: {
         change() {
-            if (this.canvasMode == "drawer") this.canvasMode = "watch";
-            else this.canvasMode = "drawer";
-            
+            if (this.canvasMode == "drawer") 
+                this.canvasMode = "watch";
+            else 
+                this.canvasMode = "drawer";
+            this.canvas = this.$refs['myCanvas']
         },
         start(e) {
             if (!this.match_start) {
@@ -420,7 +418,9 @@ var app = new Vue({
             }
         },
         changeColor(e) {
+            this.canvas = this.$refs['myCanvas']
             this.canvas.setColor(e.target.value);
+            console.log(e.target.value);
         }
     },
 });

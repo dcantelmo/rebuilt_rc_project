@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path')
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const cookieParser = require("cookie-parser");
 const cors = require('cors');
 const routesApi = require('../router/api');
 const routesClient = require("../router/client");
@@ -24,8 +26,19 @@ module.exports = (app) => {
         })
     );
 
+    app.use(cookieParser());
+    app.use(
+        session({
+            secret: "secret",
+            resave: true,
+            saveUninitialized: true,
+        })
+    );
+
     app.use(config.api.prefix, routesApi());
-    app.use(routesClient());
     
+    
+    
+    app.use(routesClient());
     app.use('/public', express.static(path.join(__dirname, "../client/public")));
 }

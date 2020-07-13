@@ -3,7 +3,7 @@ const { rooms, checkRoom } = require("./roomArray");
 module.exports = (io) => {
     io.on("connection", (socket) => {
         console.log("Connected: " + socket.id);
-
+        
         socket.on("strokes", (data) => {
             socket.broadcast.to(socket.room).emit("strokes", data);
         });

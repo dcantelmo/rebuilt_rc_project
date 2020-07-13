@@ -7,12 +7,50 @@
 
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../../public/css/login.css">
 
     <title>Login</title>
 </head>
 
 <body>
-    <h1 class="text-center">Effettua il login o registrati per iniziare a giocare!</h1>
+    <br>
+    <h1 class="text-center">Effettua il login</h1>
+
+    <form action="/login/login" method="POST">
+        <div class="form-group">
+            <label for="exampleInputEmail1">Username</label>
+            <input type="text" class="form-control" name="username" placeholder="Inserisci Username">
+            <small style= <%= errLoginUsername %> class="form-text text-muted">Questo username non è registrato</small>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">Password</label>
+            <input type="password" class="form-control" name="password" placeholder="Password">
+            <small style= <%= errLoginPassword %> class="form-text text-muted">Non è la password corretta per questo
+                username</small>
+    
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Login</button>
+        <a class="btn btn-outline-primary" href="login/oauth" role="button">Login con Google</a>
+    </form>
+
+    <hr>
+    <br>
+    <h1 class="text-center">Effettua la registrazione</h1>
+    <form method="post" action="/login/registrazione">
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" class="form-control" name="username" placeholder="Inserisci Username">
+            <small style= <%= errRegistrazioneUsername %> class="form-text text-muted">Questo username è già in uso!</small>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" name="password" placeholder="Password">
+    
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Registrazione</button>
+    </form>
+
+    
     
 </body>
 </html>

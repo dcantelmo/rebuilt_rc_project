@@ -15,7 +15,9 @@
         <button @click="change()">{{canvasMode}}</button>
         <button v-if="canvasMode == 'drawer'" id='start' @click="start($event)">Start</button>
         <h4>Timer: {{timer}}</h4>
-        <Vuechat :socket="socket" />
+        <Vueusers :socket="socket"></Vueusers>
+        <Vuechat :socket="socket"></Vuechat>
+        
     </div>
     <script src="/public/js/draw.js"></script>
 </body>

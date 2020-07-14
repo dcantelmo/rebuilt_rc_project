@@ -372,6 +372,32 @@ Vue.component("Vuechat", {
     },
 });
 
+Vue.component('Vueusers', {
+    template: `<div>
+        <div class="user-box">
+            <div v-for="(user, index) in users" :key="index" class="user">
+                <p>{{user.id}}</p>
+                <hr>
+                <p>{{user.points}}</p>
+            </div>
+        </div>
+    </div>`,
+    props: {
+        socket:""
+    },
+    data() {
+        return {
+            users: [],
+        }
+    },
+    mounted() {
+        this.socket.on("users", (data) => {
+            console.log(data);
+            this.users = data;
+        })
+    }
+})
+
 var app = new Vue({
     el: "#app",
     data: {
@@ -379,8 +405,9 @@ var app = new Vue({
         canvasMode: "drawer",
         room: "",
         pass: "",
-        username: "",
         timer: "",
+        username: "",
+        users: [],
         match_start: false,
         canvas: "",
         palette: ""
@@ -416,6 +443,8 @@ var app = new Vue({
             console.log(data);
             alert(""+data.id+" -> "+data.points)
         });
+
+        
     },
 
     methods: {

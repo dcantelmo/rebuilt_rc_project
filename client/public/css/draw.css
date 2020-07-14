@@ -5,3 +5,21 @@
     word-break: break-all;
     border: solid 2px lightcoral;   
 }
+
+.user-box {
+    border: solid 2px lightblue;
+    padding: 1rem;
+}
+
+.user {
+    width: 220px;
+    padding: .5rem;
+    border: solid 1px lightgray;
+    border-radius: 10px;
+}
+
+p{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}

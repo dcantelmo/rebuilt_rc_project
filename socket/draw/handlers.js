@@ -25,7 +25,7 @@ module.exports = (io) => {
             socket.username = data.username
             if (checkRoom(data.id, data.password) == "ok") {
                 socket.join(data.id);
-                rooms[socket.room].addUser(socket.id);
+                rooms[socket.room].addUser(socket.id, socket.username);
                 if(rooms[socket.room].drawer.id != socket.id){
                     console.log(rooms[socket.room].drawer.id);
                     io.to(rooms[socket.room].drawer.id).emit("getImageState");
@@ -66,7 +66,7 @@ module.exports = (io) => {
         socket.on("message", (data) => {
             if (socket.room && rooms[socket.room] && data == rooms[socket.room].word) {
                 console.log('ha vinto tutto: ' + socket.username);
-                rooms[socket.room].addPoints(socket);
+                rooms[socket.room].addPoints(socket.id);
                 return
             }
 

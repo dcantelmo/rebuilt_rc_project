@@ -11,14 +11,24 @@ const routesClient = require("../router/client");
 const config = require('../config');
 
 module.exports = (app) => {
-    app.get('/status', (req, res) => {
-        res.status(200).end();
-    });
-    app.head('/status', (req, res) => {
-        res.status(200).end();
-    });
+    app.use(cookieParser());
+    app.use(
+        session({
+            secret: "ajabana",
+            resave: false,
+            saveUninitialized: true,
+            //cookie: {secure: false}
+        })
+    );
 
     app.use(cors());
+
+    app.get("/status", (req, res) => {
+        res.status(200).end();
+    });
+    app.head("/status", (req, res) => {
+        res.status(200).end();
+    });
 
     app.use(
         bodyParser.urlencoded({
@@ -26,19 +36,11 @@ module.exports = (app) => {
         })
     );
 
-    app.use(cookieParser());
-    app.use(
-        session({
-            secret: "secret",
-            resave: true,
-            saveUninitialized: true,
-        })
-    );
-
     app.use(config.api.prefix, routesApi());
-    
-    
-    
+
     app.use(routesClient());
-    app.use('/public', express.static(path.join(__dirname, "../client/public")));
-}
+    app.use(
+        "/public",
+        express.static(path.join(__dirname, "../client/public"))
+    );
+};

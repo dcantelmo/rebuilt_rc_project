@@ -46,6 +46,11 @@ Vue.component("Vuecanvas", {
         };
     },
     mounted() {
+        this.socket.off("completeImage");
+        this.socket.off("getImageState");
+        this.socket.off("strokes");
+        this.socket.off("clearDrawing");
+        this.socket.off("redraw");
         this.setCanvas();
         if (this.mode === "drawer" || this.mode === "offline")
             this.bindEvents();
@@ -55,11 +60,12 @@ Vue.component("Vuecanvas", {
         subscription() {
             if (this.mode === "watch") {
                 this.socket.on(
-                    "getImageState",
+                    "completeImage",
                     ((data) => {
+                        console.log('received image');
                         this.history = data.history;
                         this.context.clearRect(0, 0, this.width, this.height);
-                        for (stroke in data.history) this._redraw(stroke);
+                        data.history.forEach((stroke) => this._redraw(stroke));
                     }).bind(this)
                 );
 
@@ -91,15 +97,14 @@ Vue.component("Vuecanvas", {
                     }).bind(this)
                 );
             } else if (this.mode === "drawer") {
-                this.socket.on(
-                    "getImageState",
-                    (() => {
-                        this.socket.emit("imageState", this.history);
-                    }).bind(this)
-                );
+
+                this.socket.on("getImageState", this.sendState);
 
                 setInterval(this.dispatcher, 20);
             }
+        },
+        sendState(){
+            this.socket.emit("imageState", {history: this.history});
         },
         dispatcher() {
             if (this.buffer) {
@@ -374,6 +379,7 @@ var app = new Vue({
         canvasMode: "drawer",
         room: "",
         pass: "",
+        username: "",
         timer: "",
         match_start: false,
         canvas: "",
@@ -382,6 +388,7 @@ var app = new Vue({
     beforeMount: function () {
         this.room = this.$el.attributes["room"].value;
         this.pass = this.$el.attributes["pass"].value;
+        this.username = this.$el.attributes["username"].value;
         this.canvas = this.$refs['myCanvas']
         this.socket = io("http://localhost:4000");
     },
@@ -389,6 +396,7 @@ var app = new Vue({
         let data = {
             id: this.room,
             password: this.pass,
+            username: this.username,
         };
         this.socket.on("notExists", () => {
             window.location.replace("http://localhost:4000/room");
@@ -399,8 +407,15 @@ var app = new Vue({
                 this.timer = data;
             }).bind(this)
         );
-
+        this.socket.on("setMode",(data) => {
+            this.canvasMode = data;
+        })
         this.socket.emit("join", data);
+
+        this.socket.on("points", (data) => {
+            console.log(data);
+            alert(""+data.id+" -> "+data.points)
+        });
     },
 
     methods: {

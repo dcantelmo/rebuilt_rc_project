@@ -9,6 +9,7 @@ module.exports = {
     serverURI: process.env.serverURI || "localhost",
     port: process.env.port || 4000,
 
+    //database
     db_username: process.env.DB_USERNAME || "admin",
     db_password: process.env.DB_PASSWORD || "admin",
     db_database_name: process.env.DB_DATABASE_NAME || "",
@@ -20,7 +21,9 @@ module.exports = {
     fb_redirect_uri: process.env.FB_REDIRECT_URI || "",
     fb_state_param: process.env.FB_STATE || "",
     fb_client_secret: process.env.FB_CLIENT_SECRET || "",
-    //databaseURL:
+    
+    //traslate api
+    translate_key: process.env.TRANSLATE_KEY || "",
 
     //jwtSecret:
 

@@ -9,7 +9,7 @@ class Room {
         this.users = [];
         this.drawer = null;
         this.io = io;
-        this.timer = 20;
+        this.timer = 10;
         this.round = 3;
         this.running = false;
         this.ended = false;
@@ -23,19 +23,27 @@ class Room {
             points: 0,
         });
         if (this.users.length == 1)
-            this.drawer = this.users[0];
+            this.drawer = {
+                id: user,
+                position: 0,
+            };
+        if(user == this.drawer.id)
+            this.io.to(user).emit("setMode", "drawer");
+        else
+            this.io.to(user).emit("setMode", "watch");
     }
     removeUser(user) {
         for (let i = 0; i < this.users.length; i++) {
             if (this.users[i].id == user) {
+                if (user == this.drawer.id){
+                    this.assignDrawer();
+                    if(this.drawer.position > 0)
+                        this.drawer.position--;
+                    console.log('uscito il disegnatore');
+                }
                 this.users.splice(i, 1);
                 if (this.users.length <= 0)
                     this.empty = true;
-                if (
-                    user == this.drawer.id &&
-                    this.drawer.position >= this.users.length
-                )
-                    this.assignDrawer();
             }
         }
     }
@@ -47,7 +55,16 @@ class Room {
             this.drawer.position = 0;
             if (this.round == 1) this.ended = true;
             else this.round--;
-        } else this.empty = true;
+        } else 
+            this.empty = true;
+        
+        this.users.forEach((user) => {
+            console.log(user.id, this.drawer.id)
+            if(user.id == this.drawer.id)
+                this.io.to(user.id).emit("setMode", "drawer");
+            else
+                this.io.to(user.id).emit("setMode", "watch");
+        })
     }
     getWinner() {
         let winner = {
@@ -61,12 +78,21 @@ class Room {
         }
         return winner;
     }
+    addPoints(socket){
+        this.users.forEach((user) => {
+            if(user.id == socket.id){
+                user.points += (this.timer);
+                this.io.to(socket.room).emit("points", {id: socket.id, points: user.points});
+                return;
+            }
+        });
+    }
     start() {
         if (!this.running && this.round > 0) {
             getRandomWord.random().then((word) => this.word = word).then(() => {
                 this.running = true;
                 if (this.ended) {
-                    this.assignDrawer();
+                    
                     this.ended = false;
                 }
                 console.log(this.word);
@@ -77,9 +103,9 @@ class Room {
                         this.io.to(this.id).emit("timerEvent", this.timer);
                         if (this.timer <= 0) {
                             this.ended = true;
-                            this.timer = 90;
-                            this.round--;
-                            this.running = false;                            
+                            this.timer = 10;
+                            this.running = false;
+                            this.assignDrawer();                     
                             clearInterval(this.interval);
                         }
                         else this.timer--;

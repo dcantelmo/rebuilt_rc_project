@@ -26,18 +26,21 @@ module.exports = (app) => {
 
     router.post("/draw", (req, res) => {
         if (req.body) {
-            if (checkRoom(req.body.id, req.body.password) == "ok")
+            if (checkRoom(req.body.id, req.body.password) == "ok"){
                 res.render("draw/draw", {
                     ROOM: req.body.id,
-                    PASSWORD: req.body.password
+                    PASSWORD: req.body.password,
+                    USERNAME: req.session.username
                 });
+            }
             else if (checkRoom(req.body.id, req.body.password) == "password") {
                 res.redirect(`/room?err=password&roomName=${req.body.id}`);
             } else {
                 createRoom(req.body.id, req.body.password, io);
                 res.render("draw/draw", {
                     ROOM: req.body.id,
-                    PASSWORD: req.body.password
+                    PASSWORD: req.body.password,
+                    USERNAME: req.session.username
                 });
             }
         } else res.sendStatus(400);

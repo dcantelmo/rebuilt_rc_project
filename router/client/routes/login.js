@@ -26,14 +26,12 @@ module.exports = (app) => {
     router.post("/login", (req, res) => {
         const username = req.body.username;
         const password = req.body.password;
-        req.session.cookie.nickname = username;
         couch.get(config.db_database_name, config.db_document).then(
             function (data, headers, status) {
                 if (data.data.users.hasOwnProperty(username)) {
                     //se esiste username
                     if (data.data.users[username].password == password) {
                         //se la password è corretta
-                        req.session.loggedin = true;
                         req.session.username = username;
                         res.redirect("/room");
                     } else {
@@ -62,7 +60,6 @@ module.exports = (app) => {
     router.post("/registrazione", (req, res) => {
         const username = req.body.username;
         const password = req.body.password;
-        req.session.cookie.nickname = username;
         couch.get(config.db_database_name, config.db_document).then(
             function (data, headers, status) {
                 if (data.data.users.hasOwnProperty(username)) {
@@ -72,6 +69,7 @@ module.exports = (app) => {
                         errRegistrazioneUsername: "display:;",
                     });
                 } else {
+                    req.session.username = username;
                     data.data.users[username] = {
                         username: username,
                         password: password,
@@ -93,7 +91,7 @@ module.exports = (app) => {
     });
 
     router.get("/oauth", (req, res) => {
-        //prendo access code
+        //chiedo access code a facebook (che lo manda su redirect_uri)
         res.redirect(
             "https://www.facebook.com/v7.0/dialog/oauth?client_id=" +
                 config.fb_client_id +
@@ -105,10 +103,12 @@ module.exports = (app) => {
         );
     });
 
+    /*reindirizzamento a facebook per ottenere l'autorizzazione e il code (sulla redirect_uri) */
     router.get("/oauth/token", (req, res) => {
         let code = req.query.code;
         let access_token;
-        //scambio code per accesso token del client
+
+        //scambio code per access token del client
         axios
             .get(
                 "https://graph.facebook.com/v7.0/oauth/access_token?client_id=" +
@@ -124,10 +124,12 @@ module.exports = (app) => {
                 access_token = response.data.access_token;
 
                 console.log("Token client ottenuto");
-                req.session.cookie.token = access_token;
+                req.session.token = access_token;
 
+                //creazione app token (client_id|client_secret)
                 let appToken =
                     config.fb_client_id + "|" + config.fb_client_secret;
+                    
                 //controllo token client tramite token app
                 axios
                     .get(
@@ -144,7 +146,7 @@ module.exports = (app) => {
                                 const username = resp.data.name;
                                 const token = access_token;
 
-                                req.session.cookie.nickname = username;
+                                req.session.username = username;
 
                                 couch
                                     .get(
@@ -153,9 +155,8 @@ module.exports = (app) => {
                                     )
                                     .then(
                                         function (data, headers, status) {
-                                            if (data.data.users.hasOwnProperty(user_id)) {
-                                                res.redirect("/room")
-                                            } else {
+                                            //non controllo se gia esiste poichè ad ogni login aggiorniamo username e password 
+                                            //che potrebbero essere cambiati dall'ultimo login
                                                 data.data.users[user_id] = {
                                                     username: username,
                                                     token: access_token,
@@ -167,14 +168,13 @@ module.exports = (app) => {
                                                             res.redirect("/room");
                                                         },
                                                         function (err) {
-                                                            console.log(err);
+                                                            res.send(err);
                                                         }
                                                     );
+                                            },
+                                            function (err) {
+                                                res.send(err);
                                             }
-                                        },
-                                        function (err) {
-                                            res.send(err);
-                                        }
                                     );
                             })
                             .catch((err) => {
@@ -191,3 +191,6 @@ module.exports = (app) => {
             });
     });
 };
+
+
+//res.cookie("username",username,{expires: new Date}).send()

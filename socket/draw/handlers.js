@@ -3,7 +3,7 @@ const { rooms, checkRoom } = require("./roomArray");
 module.exports = (io) => {
     io.on("connection", (socket) => {
         console.log("Connected: " + socket.id);
-        
+
         socket.on("strokes", (data) => {
             socket.broadcast.to(socket.room).emit("strokes", data);
         });
@@ -17,14 +17,20 @@ module.exports = (io) => {
         });
 
         socket.on("imageState", (data) => {
-            socket.broadcast.to(socket.room).emit("getImageState", data);
+            socket.broadcast.to(socket.room).emit("completeImage", data);
         });
 
         socket.on("join", (data) => {
             socket.room = data.id;
+            socket.username = data.username
             if (checkRoom(data.id, data.password) == "ok") {
                 socket.join(data.id);
                 rooms[socket.room].addUser(socket.id);
+                if(rooms[socket.room].drawer.id != socket.id){
+                    console.log(rooms[socket.room].drawer.id);
+                    io.to(rooms[socket.room].drawer.id).emit("getImageState");
+                    console.log('joinedroom');
+                }
             }
             else {
                 socket.emit("notExists");
@@ -51,17 +57,21 @@ module.exports = (io) => {
             }
 
         });
+        socket.on("points", (data) => {
+            console.log(`Avvio game in room: ${data.username} -> ${data.points}`);
+        });
 
         //CHAT AREA
 
         socket.on("message", (data) => {
-            if (data == rooms[socket.room].word) {
-                console.log('ha vinto tutto: ' + socket.id);
-                return;
+            if (socket.room && rooms[socket.room] && data == rooms[socket.room].word) {
+                console.log('ha vinto tutto: ' + socket.username);
+                rooms[socket.room].addPoints(socket);
+                return
             }
 
             let package = {
-                user: socket.id,
+                user: socket.username,
                 text: data,
             };
 

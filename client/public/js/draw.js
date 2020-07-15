@@ -309,7 +309,7 @@ Vue.component("Vuecanvas", {
 });
 
 Vue.component("Vueword", {
-    template: `<div>{{laparola}}</div>`,
+    template: `<h1 class="display-4">{{laparola}}</h1>`,
     props: {
         socket: "",
     },
@@ -328,7 +328,7 @@ Vue.component("Vueword", {
 Vue.component("Vuewinner", {
     template: `
                 <div :style="display" class="alert alert-success" role="alert">
-                    Il vincitore è {{winner}}
+                    Il vincitore è {{winner}}! [Prossima partita in: {{gameTimer}}]
                 </div>`,
 
     props: {
@@ -340,12 +340,19 @@ Vue.component("Vuewinner", {
     data() {
         return {
             winner: "",
+            gameTimer: "",
         };
     },
     mounted() {
         this.socket.on("winner", (data) => {
             this.winner = data.username;
             this.display = "";
+        });
+        this.socket.on("gameTimer", (data) => {
+            if(data == 0)
+                this.display = "display: none;";
+            else
+                this.gameTimer = data;
         });
     },
 });
@@ -407,9 +414,11 @@ Vue.component("Vueusers", {
                 <p><svg v-if="drawer == user.id" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" d="M11.293 1.293a1 1 0 0 1 1.414 0l2 2a1 1 0 0 1 0 1.414l-9 9a1 1 0 0 1-.39.242l-3 1a1 1 0 0 1-1.266-1.265l1-3a1 1 0 0 1 .242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z"/>
                 <path fill-rule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 0 0 .5.5H4v.5a.5.5 0 0 0 .5.5H5v.5a.5.5 0 0 0 .5.5H6v-1.5a.5.5 0 0 0-.5-.5H5v-.5a.5.5 0 0 0-.5-.5H3z"/>
-                </svg> | {{user.username}}</p>
+                </svg> | {{user.username}} </p>
                 <hr>
-                <p>Points: {{user.points}}</p>
+                <p>Points:{{user.points}}</p>
+                <p><span v-if="drawer == user.id && roundTimer != 0">Waiting time: {{roundTimer}}</span></p>
+                
             </div>
         </div>
     </div>`,
@@ -420,6 +429,7 @@ Vue.component("Vueusers", {
         return {
             users: [],
             drawer: "",
+            roundTimer: "",
         };
     },
     mounted() {
@@ -427,9 +437,15 @@ Vue.component("Vueusers", {
             this.users = data.users;
             this.drawer = data.drawer;
         });
+        this.socket.on("roundTimer", (data) => {
+            this.roundTimer = data;
+        });
         this.socket.on("setDrawer", (data) => {
             this.drawer = data;
         });
+        this.socket.on("points", (data) => {
+            this.users=data;
+        })
     },
 });
 

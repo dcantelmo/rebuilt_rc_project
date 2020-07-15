@@ -82,17 +82,18 @@ class Room {
         this.users.forEach((user) => {
             if (user.id == userid) {
                 user.points += this.timer;
-                this.io
-                    .to(this.id)
-                    .emit("points", { id: user.username, points: user.points });
                 return;
             }
         });
-        this.sendUsers();
+        this.sendUsers()
     }
-    checkWord(userid, word){
-        if(this.running)
-            if (userid != this.drawer.id && !this.guessed[userid] && word == this.word) {
+    checkWord(userid, word) {
+        if (this.running)
+            if (
+                userid != this.drawer.id &&
+                !this.guessed[userid] &&
+                word == this.word
+            ) {
                 this.guessed[userid] = true;
                 this.addPoints(userid);
             }
@@ -105,10 +106,45 @@ class Room {
         };
         this.io.to(this.id).emit("users", data);
     }
+
+    roundPause() {
+        var roundTimer = 5;
+        var roundInterval = setInterval(
+            (() => {
+                if (roundTimer <= 0) {
+                    this.start();
+                    clearInterval(roundInterval);
+                } else roundTimer--;
+                this.io.to(this.id).emit("roundTimer", roundTimer);
+            }).bind(this),
+            1000
+        );
+    }
+
+    gamePause() {
+        var gameTimer = 15;
+        var gameInterval = setInterval(
+            (() => {
+                if (gameTimer <= 0) {
+                    this.users.forEach((user) => {
+                        user.points = 0;
+                    })
+                    this.sendUsers();
+                    this.round=1;
+                    this.ended = false;  //aaaaaaaaaaa
+                    this.start();
+                    clearInterval(gameInterval);
+                } else gameTimer--;
+                this.io.to(this.id).emit("gameTimer", gameTimer);
+            }).bind(this),
+            1000
+        );
+    }
     start() {
         if (this.ended) {
             this.io.to(this.id).emit("winner", this.getWinner());
             console.log("vincitore: ", this.getWinner());
+            this.gamePause();
             return;
         }
         if (!this.running && this.round > 0) {
@@ -124,7 +160,7 @@ class Room {
                         let data;
                         if (user.id == this.drawer.id) data = this.word[0];
                         else {
-                            data = ("_ ").repeat(this.word[0].length);
+                            data = "_ ".repeat(this.word[0].length);
                         }
                         this.io.to(user.id).emit("word", data);
                     });
@@ -136,6 +172,7 @@ class Room {
                                 this.running = false;
                                 this.assignDrawer();
                                 clearInterval(this.interval);
+                                this.roundPause();
                             } else this.timer--;
                             this.io.to(this.id).emit("timerEvent", this.timer);
                         }).bind(this),

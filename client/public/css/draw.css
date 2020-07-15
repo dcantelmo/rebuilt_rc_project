@@ -1,14 +1,24 @@
+.content{
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
 .message-box{
     height: 20vh;
     width: 50vw;
     overflow: auto;
     word-break: break-all;
-    border: solid 2px lightcoral;   
+    border: solid 2px lightcoral;
+
+}
+
+.vuecanvas{
+    border: solid 2px lightgreen;   
 }
 
 .user-box {
     border: solid 2px lightblue;
-    padding: 1rem;
+    width: 35vw;
 }
 
 .user {

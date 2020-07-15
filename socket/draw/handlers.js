@@ -65,8 +65,7 @@ module.exports = (io) => {
 
         socket.on("message", (data) => {
             if (socket.room && rooms[socket.room] && data == rooms[socket.room].word) {
-                console.log('ha vinto tutto: ' + socket.username);
-                rooms[socket.room].addPoints(socket.id);
+                rooms[socket.room].checkWord(socket.id, data);
                 return
             }
 

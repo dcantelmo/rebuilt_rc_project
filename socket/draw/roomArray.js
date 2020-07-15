@@ -1,4 +1,4 @@
-const getRandomWord = require('../../randomWord');
+const getRandomWord = require("../../randomWord");
 
 var rooms = {};
 
@@ -14,8 +14,9 @@ class Room {
         this.running = false;
         this.ended = false;
         this.empty = false;
-        this.word = 'prova';
+        this.word = "prova";
         this.interval = null;
+        this.guessed = {};
     }
     addUser(user, username) {
         this.users.push({
@@ -28,24 +29,20 @@ class Room {
                 id: user,
                 position: 0,
             };
-        if(user == this.drawer.id)
-            this.io.to(user).emit("setMode", "drawer");
-        else
-            this.io.to(user).emit("setMode", "watch");
+        if (user == this.drawer.id) this.io.to(user).emit("setMode", "drawer");
+        else this.io.to(user).emit("setMode", "watch");
         this.sendUsers();
     }
     removeUser(user) {
         for (let i = 0; i < this.users.length; i++) {
             if (this.users[i].id == user) {
-                if (user == this.drawer.id){
+                if (user == this.drawer.id) {
                     this.assignDrawer();
-                    if(this.drawer.position > 0)
-                        this.drawer.position--;
-                    console.log('uscito il disegnatore');
+                    if (this.drawer.position > 0) this.drawer.position--;
+                    console.log("uscito il disegnatore");
                 }
                 this.users.splice(i, 1);
-                if (this.users.length <= 0)
-                    this.empty = true;
+                if (this.users.length <= 0) this.empty = true;
             }
         }
         this.sendUsers();
@@ -58,21 +55,22 @@ class Room {
             this.drawer.position = 0;
             if (this.round == 1) this.ended = true;
             else this.round--;
-        } else 
-            this.empty = true;
-        
+        } else this.empty = true;
+
         this.users.forEach((user) => {
-            console.log(user.id, this.drawer.id)
-            if(user.id == this.drawer.id)
+            console.log(user.id, this.drawer.id);
+            if (user.id == this.drawer.id)
                 this.io.to(user.id).emit("setMode", "drawer");
-            else
+            else {
                 this.io.to(user.id).emit("setMode", "watch");
-        })
+            }
+        });
+        this.io.to(this.id).emit("setDrawer", this.drawer.id);
     }
     getWinner() {
         let winner = {
             points: -1,
-        }
+        };
         for (let i = 0; i < this.users.length; i++) {
             if (this.users[i].points >= winner.points) {
                 winner = this.users[i];
@@ -80,46 +78,70 @@ class Room {
         }
         return winner;
     }
-    addPoints(userid){
+    addPoints(userid) {
         this.users.forEach((user) => {
-            if(user.id == userid){
-                user.points += (this.timer);
-                this.io.to(this.id).emit("points", {id: user.username, points: user.points});
+            if (user.id == userid) {
+                user.points += this.timer;
+                this.io
+                    .to(this.id)
+                    .emit("points", { id: user.username, points: user.points });
                 return;
             }
         });
         this.sendUsers();
     }
-    sendUsers(){
-        console.log('sendingUsers')
-        this.io.to(this.id).emit("users", this.users);
+    checkWord(userid, word){
+        if(this.running)
+            if (userid != this.drawer.id && !this.guessed[userid] && word == this.word) {
+                this.guessed[userid] = true;
+                this.addPoints(userid);
+            }
+    }
+    sendUsers() {
+        console.log("sendingUsers");
+        let data = {
+            users: this.users,
+            drawer: this.drawer.id,
+        };
+        this.io.to(this.id).emit("users", data);
     }
     start() {
-        if(this.ended){
+        if (this.ended) {
             this.io.to(this.id).emit("winner", this.getWinner());
-            console.log('vincitore: ', this.getWinner());
+            console.log("vincitore: ", this.getWinner());
             return;
         }
         if (!this.running && this.round > 0) {
-            getRandomWord.random().then((word) => this.word = word).then(() => {
-                this.running = true;
-                console.log(this.word);
-                console.log(this.drawer);
-                this.io.to(this.drawer.id).emit("word", this.word);
-                this.interval = setInterval(
-                    (() => {
-                        this.io.to(this.id).emit("timerEvent", this.timer);
-                        if (this.timer <= 0) {
-                            this.timer = 10;
-                            this.running = false;
-                            this.assignDrawer();                     
-                            clearInterval(this.interval);
+            getRandomWord
+                .random()
+                .then((word) => (this.word = word))
+                .then(() => {
+                    this.running = true;
+                    console.log(this.word);
+                    console.log(this.drawer);
+                    this.guessed = {};
+                    this.users.forEach((user) => {
+                        let data;
+                        if (user.id == this.drawer.id) data = this.word[0];
+                        else {
+                            data = ("_ ").repeat(this.word[0].length);
                         }
-                        else this.timer--;
-                    }).bind(this),
-                    1000
-                );
-            });
+                        this.io.to(user.id).emit("word", data);
+                    });
+
+                    this.interval = setInterval(
+                        (() => {
+                            if (this.timer <= 0) {
+                                this.timer = 10;
+                                this.running = false;
+                                this.assignDrawer();
+                                clearInterval(this.interval);
+                            } else this.timer--;
+                            this.io.to(this.id).emit("timerEvent", this.timer);
+                        }).bind(this),
+                        1000
+                    );
+                });
         }
     }
 }

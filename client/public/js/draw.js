@@ -1,5 +1,5 @@
 Vue.component("Vuecanvas", {
-    template: `<canvas :style="{cursor: selectedCursor}" ref="v-canvas" :width="width" :height="height"></canvas>`,
+    template: `<canvas class="vuecanvas" :style="{cursor: selectedCursor}" ref="v-canvas" :width="width" :height="height"></canvas>`,
     props: {
         width: {
             default: 300,
@@ -62,7 +62,7 @@ Vue.component("Vuecanvas", {
                 this.socket.on(
                     "completeImage",
                     ((data) => {
-                        console.log('received image');
+                        console.log("received image");
                         this.history = data.history;
                         this.context.clearRect(0, 0, this.width, this.height);
                         data.history.forEach((stroke) => this._redraw(stroke));
@@ -97,14 +97,13 @@ Vue.component("Vuecanvas", {
                     }).bind(this)
                 );
             } else if (this.mode === "drawer") {
-
                 this.socket.on("getImageState", this.sendState);
 
                 setInterval(this.dispatcher, 20);
             }
         },
-        sendState(){
-            this.socket.emit("imageState", {history: this.history});
+        sendState() {
+            this.socket.emit("imageState", { history: this.history });
         },
         dispatcher() {
             if (this.buffer) {
@@ -121,7 +120,6 @@ Vue.component("Vuecanvas", {
                                 strokes.push(temp[++i].stroke);
                             }
                             this.socket.emit("strokes", strokes);
-                            console.log(strokes);
                             break;
                         case "clear":
                             this.socket.emit("clearDrawing");
@@ -313,19 +311,44 @@ Vue.component("Vuecanvas", {
 Vue.component("Vueword", {
     template: `<div>{{laparola}}</div>`,
     props: {
-        socket: ''
+        socket: "",
     },
     data() {
         return {
-            laparola: ''
-        }
+            laparola: "",
+        };
     },
     mounted() {
         this.socket.on("word", (data) => {
             this.laparola = data;
-        })
-    }
-})
+        });
+    },
+});
+
+Vue.component("Vuewinner", {
+    template: `
+                <div :style="display" class="alert alert-success" role="alert">
+                    Il vincitore è {{winner}}
+                </div>`,
+
+    props: {
+        socket: "",
+        display: {
+            default: "display: none;",
+        },
+    },
+    data() {
+        return {
+            winner: "",
+        };
+    },
+    mounted() {
+        this.socket.on("winner", (data) => {
+            this.winner = data.username;
+            this.display = "";
+        });
+    },
+});
 
 Vue.component("Vuechat", {
     template: `<div>
@@ -349,8 +372,8 @@ Vue.component("Vuechat", {
             this.messages.push(data);
             this.$nextTick(() => {
                 let box = document.getElementById("messageBox");
-                    this.updateScroll();
-            })
+                this.updateScroll();
+            });
         });
     },
     methods: {
@@ -365,38 +388,50 @@ Vue.component("Vuechat", {
         },
         updateScroll() {
             let element = document.getElementById("messageBox");
-            if ((element.scrollHeight - element.clientHeight - element.scrollTop < 60)) { 
+            if (
+                element.scrollHeight -
+                    element.clientHeight -
+                    element.scrollTop <
+                60
+            ) {
                 element.scrollTop = element.scrollHeight;
             }
         },
     },
 });
 
-Vue.component('Vueusers', {
+Vue.component("Vueusers", {
     template: `<div>
         <div class="user-box">
             <div v-for="(user, index) in users" :key="index" class="user">
-                <p>{{user.id}}</p>
+                <p><svg v-if="drawer == user.id" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M11.293 1.293a1 1 0 0 1 1.414 0l2 2a1 1 0 0 1 0 1.414l-9 9a1 1 0 0 1-.39.242l-3 1a1 1 0 0 1-1.266-1.265l1-3a1 1 0 0 1 .242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z"/>
+                <path fill-rule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 0 0 .5.5H4v.5a.5.5 0 0 0 .5.5H5v.5a.5.5 0 0 0 .5.5H6v-1.5a.5.5 0 0 0-.5-.5H5v-.5a.5.5 0 0 0-.5-.5H3z"/>
+                </svg> | {{user.username}}</p>
                 <hr>
-                <p>{{user.points}}</p>
+                <p>Points: {{user.points}}</p>
             </div>
         </div>
     </div>`,
     props: {
-        socket:""
+        socket: "",
     },
     data() {
         return {
             users: [],
-        }
+            drawer: "",
+        };
     },
     mounted() {
         this.socket.on("users", (data) => {
-            console.log(data);
-            this.users = data;
-        })
-    }
-})
+            this.users = data.users;
+            this.drawer = data.drawer;
+        });
+        this.socket.on("setDrawer", (data) => {
+            this.drawer = data;
+        });
+    },
+});
 
 var app = new Vue({
     el: "#app",
@@ -410,13 +445,13 @@ var app = new Vue({
         users: [],
         match_start: false,
         canvas: "",
-        palette: ""
+        palette: "",
     },
     beforeMount: function () {
         this.room = this.$el.attributes["room"].value;
         this.pass = this.$el.attributes["pass"].value;
         this.username = this.$el.attributes["username"].value;
-        this.canvas = this.$refs['myCanvas']
+        this.canvas = this.$refs["myCanvas"];
         this.socket = io("http://localhost:4000");
     },
     mounted() {
@@ -434,26 +469,21 @@ var app = new Vue({
                 this.timer = data;
             }).bind(this)
         );
-        this.socket.on("setMode",(data) => {
+        this.socket.on("setMode", (data) => {
             this.canvasMode = data;
-        })
+        });
         this.socket.emit("join", data);
 
         this.socket.on("points", (data) => {
             console.log(data);
-            alert(""+data.id+" -> "+data.points)
         });
-
-        
     },
 
     methods: {
         change() {
-            if (this.canvasMode == "drawer") 
-                this.canvasMode = "watch";
-            else 
-                this.canvasMode = "drawer";
-            this.canvas = this.$refs['myCanvas']
+            if (this.canvasMode == "drawer") this.canvasMode = "watch";
+            else this.canvasMode = "drawer";
+            this.canvas = this.$refs["myCanvas"];
         },
         start(e) {
             if (!this.match_start) {
@@ -462,9 +492,9 @@ var app = new Vue({
             }
         },
         changeColor(e) {
-            this.canvas = this.$refs['myCanvas']
+            this.canvas = this.$refs["myCanvas"];
             this.canvas.setColor(e.target.value);
             console.log(e.target.value);
-        }
+        },
     },
 });

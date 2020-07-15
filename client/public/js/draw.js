@@ -456,6 +456,16 @@ var app = new Vue({
         canvasMode: "drawer",
         room: "",
         pass: "",
+    },
+});
+
+var app = new Vue({
+    el: "#app",
+    data: {
+        socket: "",
+        canvasMode: "drawer",
+        room: "",
+        pass: "",
         timer: "",
         username: "",
         users: [],

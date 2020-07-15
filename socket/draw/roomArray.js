@@ -120,7 +120,6 @@ class Room {
             1000
         );
     }
-
     gamePause() {
         var gameTimer = 15;
         var gameInterval = setInterval(

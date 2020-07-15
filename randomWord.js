@@ -1,7 +1,7 @@
 const fs = require("fs");
 const express = require("express");
 const config = require("./config");
-const unirest = require("unirest")
+const unirest = require("unirest");
 
 module.exports = {
     random(num = 1) {
@@ -11,7 +11,7 @@ module.exports = {
                     return console.log(err);
                 }
                 let names = data.split("\n").map((x) => x.trim());
-               
+
                 let words = [];
                 for (let i = 0; i < num; i++) {
                     words.push(names[Math.floor(Math.random() * names.length)]);
@@ -24,7 +24,6 @@ module.exports = {
 
     translate(words, req) {
         return new Promise((resolve, reject) => {
-            /*
             let text = words.join(",");
             let result;
             console.log(text);
@@ -50,26 +49,24 @@ module.exports = {
             });
 
             req.end(function (res) {
-                if (res.error){
-                    console.log(res.error)
+                if (res.error) {
+                    console.log(res.error);
                     reject();
-                } else{
-                result =  res.body.data.translations[0].translatedText;
-                result = result.split(',');
-                
+                } else {
+                    result = res.body.data.translations[0].translatedText;
+                    result = result.split(",");
+
+                    //let result="ajabana,cicciobello,la cantina,il libro,la scuola,locapo,lo scaldabagno,malo sogno";
+                    result = result.replace(/,il /g, ",");
+                    result = result.replace(/,lo /g, ",");
+                    result = result.replace(/,la /g, ",");
+                    result = result.replace(/,i /g, ",");
+                    result = result.replace(/,gli /g, ",");
+                    result = result.replace(/,le /g, ",");
+                    result = result.split(",");
+                    resolve(result);
+                }
             });
-            result = "ajabana"
-             resolve(result)}
-            */
-           let result="ajabana,cicciobello,la cantina,il libro,la scuola,locapo,lo scaldabagno,malo sogno";
-           result = result.replace(/,il /g, ",");
-           result = result.replace(/,lo /g, ",");
-           result = result.replace(/,la /g, ",");
-           result = result.replace(/,i /g, ",");
-           result = result.replace(/,gli /g, ",");
-           result = result.replace(/,le /g, ",");
-           result = result.split(',');
-           resolve(result);
-        }); 
+        });
     },
 };

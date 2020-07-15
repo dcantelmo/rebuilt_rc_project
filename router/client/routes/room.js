@@ -11,20 +11,34 @@ module.exports = (app) => {
     app.use("/room", router);
 
     router.get("/", (req, res) => {
+        if(!req.session.api_key && !req.session.token){ 
+            res.redirect("/login");
+            return;
+        }
+
         error = req.query.err;
         if (error) {
             res.render("room/room", {
                 room_link: `/room/draw`,
                 error: "Insisci la password corretta per la stanza!",
+                username: req.session.username,
+                api_key: req.session.api_key,
             });
         } else {
             res.render("room/room", {
                 room_link: `/room/draw`,
+                username: req.session.username,
+                api_key: req.session.api_key,
             });
         }
     });
 
     router.post("/draw", (req, res) => {
+        if(!req.session.api_key && !req.session.token){ 
+            res.redirect("/login");
+            return;
+        }
+
         if (req.body) {
             if (checkRoom(req.body.id, req.body.password) == "ok"){
                 res.render("draw/draw", {

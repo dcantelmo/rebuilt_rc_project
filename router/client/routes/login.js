@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const config = require("../../../config");
 const db = require("node-couchdb");
+const jwt = require('jsonwebtoken');
 const router = Router();
 const axios = require("axios");
 const middleware = require("../../middleware");
@@ -16,6 +17,11 @@ module.exports = (app) => {
     app.use("/login", router);
 
     router.get("/", (req, res) => {
+        if(req.session.api_key || req.session.token){ 
+            res.redirect("/room");
+            return;
+        }
+
         res.render("login/login", {
             errLoginUsername: "display:none;",
             errLoginPassword: "display:none;",
@@ -23,7 +29,7 @@ module.exports = (app) => {
         });
     });
 
-    router.post("/login", (req, res) => {
+    router.post("/", (req, res) => {
         const username = req.body.username;
         const password = req.body.password;
         couch.get(config.db_database_name, config.db_document).then(
@@ -33,6 +39,7 @@ module.exports = (app) => {
                     if (data.data.users[username].password == password) {
                         //se la password è corretta
                         req.session.username = username;
+                        req.session.api_key= data.data.users[username].api_key;
                         res.redirect("/room");
                     } else {
                         //se la password è sbagliata
@@ -56,6 +63,11 @@ module.exports = (app) => {
             }
         );
     });
+    router.get("/logout", (req, res) => {
+        req.session.token = '';
+        req.session.api_key = '';
+        res.redirect("/");
+    })
 
     router.post("/registrazione", (req, res) => {
         const username = req.body.username;
@@ -70,9 +82,14 @@ module.exports = (app) => {
                     });
                 } else {
                     req.session.username = username;
+                    //genero api_key    
+                    let token = jwt.sign({username: username, password: password}, 'ajabana');
+                    req.session.api_key = token;
                     data.data.users[username] = {
                         username: username,
                         password: password,
+                        //inserisco api_key
+                        api_key: token,
                     };
                     couch.update(config.db_database_name, data.data).then(
                         function (data, headers, status) {
@@ -151,15 +168,18 @@ module.exports = (app) => {
                                 couch
                                     .get(
                                         config.db_database_name,
-                                        config.db_document_facebook
+                                        config.db_document
                                     )
                                     .then(
                                         function (data, headers, status) {
                                             //non controllo se gia esiste poichè ad ogni login aggiorniamo username e password 
                                             //che potrebbero essere cambiati dall'ultimo login
+                                                let api_key = jwt.sign({user_id: user_id, username: username }, 'ajabana');
+                                                req.session.api_key = api_key;
                                                 data.data.users[user_id] = {
                                                     username: username,
                                                     token: access_token,
+                                                    api_key: api_key,
                                                 };
                                                 couch
                                                     .update(config.db_database_name, data.data)
@@ -191,6 +211,5 @@ module.exports = (app) => {
             });
     });
 };
-
 
 //res.cookie("username",username,{expires: new Date}).send()

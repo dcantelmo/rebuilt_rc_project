@@ -1,24 +1,54 @@
+body{
+    background: linear-gradient(rgb(129, 191, 219),rgb(255, 255, 255));
+    min-height: 100vh;
+}
 .content{
-    margin-top: 10px;
-    margin-left: 10px;
+    margin-left: 5vw;
+    margin-right: 5vw;
+    width:90vw;
+}
+.winner{
+    height: 5vh;
+}
+.align-bottom{
+    margin-top: 48px;
+    position:bottom !important;
+}
+.canvas-wrap{
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.first-row{
+    margin-left: calc(15vw + calc((45vw - 700px)/2));    
+    height: 95px !important;
+    width: 687px;
+}
+.sinistra{
+    width:15vw;
+}
+.destra{
+    width:30vw;
+}
+.centro{
+    margin-left: calc((45vw - 700px)/2);
+    margin-right: calc((45vw - 700px)/2);
 }
 
 .message-box{
     height: 20vh;
-    width: 50vw;
     overflow: auto;
     word-break: break-all;
-    border: solid 2px lightcoral;
+    border: solid 1px black;
+    background-color: rgba(255, 255, 255, 0.7);
 
 }
 
 .vuecanvas{
-    border: solid 2px lightgreen;   
+    border: solid 1px black;   
 }
 
 .user-box {
     border: solid 2px lightblue;
-    width: 35vw;
 }
 
 .user {
@@ -32,4 +62,8 @@ p{
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+
+input [type=text]{
+    border-radius:15px;
 }

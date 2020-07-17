@@ -4,6 +4,7 @@ const getWord = require("../../../randomWord");
 const jwt = require("jsonwebtoken");
 const db = require("node-couchdb");
 const config = require("../../../config");
+const path = require("path");
 
 const couch = new db({
     auth: {
@@ -58,10 +59,18 @@ module.exports = (app) => {
                             if (decode.user_id) {
                                 let user_id = decode.user_id;
                                 if (data.data.users[user_id]) {
-                                    res.send(
+                                    if(err)
+                                        console.log(err)
+                                    else
+                                    fs.readdir('./user_images', (err,files) => {
+                                        files.forEach(file => {
+                                            console.log(file);
+                                        });
+                                    });
+                                    /*res.send(
                                         "immagine di " +
                                             data.data.users[user_id].username
-                                    );
+                                    );*/
                                 } else res.send("utente non presente");
                             } else if (decode.username) {
                                 let username = decode.username;
@@ -71,10 +80,23 @@ module.exports = (app) => {
                                     data.data.users[username].password ==
                                         password
                                 ) {
+                                    fs.readdir(
+                                        './user_images',
+                                        (err, files) => {
+                                            if(err)
+                                                console.log(err)
+                                            else
+                                                files.forEach((file) => {
+                                                    console.log(file);
+                                                });
+                                        }
+                                    );
+                                    /////////////////////////////////////////
+                                    /*
                                     res.send(
                                         "immagine di " +
                                             data.data.users[username].username
-                                    );
+                                    );*/
                                 } else {
                                     res.send("utente non presente");
                                 }

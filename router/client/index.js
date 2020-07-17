@@ -2,7 +2,7 @@ const { Router } = require("express");
 const room = require("./routes/room");
 const home = require("./routes/home");
 const login = require("./routes/login");
-const free_drawing = require("./routes/free_drawing");
+const free_drawing = require("./routes/freeDraw");
 
 
 module.exports = () => {

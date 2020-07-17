@@ -92,7 +92,7 @@ class Room {
             if (
                 userid != this.drawer.id &&
                 !this.guessed[userid] &&
-                word == this.word
+                word.trim().toLowerCase() == this.word
             ) {
                 this.guessed[userid] = true;
                 this.addPoints(userid);

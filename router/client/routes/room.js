@@ -34,10 +34,11 @@ module.exports = (app) => {
     });
 
     router.post("/draw", (req, res) => {
+        /*
         if(!req.session.api_key && !req.session.token){ 
             res.redirect("/login");
             return;
-        }
+        }*/
 
         if (req.body) {
             if (checkRoom(req.body.id, req.body.password) == "ok"){

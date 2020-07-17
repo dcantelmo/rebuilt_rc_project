@@ -38,6 +38,7 @@ module.exports = (app) => {
                     //se esiste username
                     if (data.data.users[username].password == password) {
                         //se la password è corretta
+                        req.session.user_id = username;
                         req.session.username = username;
                         req.session.api_key= data.data.users[username].api_key;
                         res.redirect("/room");
@@ -82,6 +83,7 @@ module.exports = (app) => {
                     });
                 } else {
                     req.session.username = username;
+                    req.session.user_id = username;
                     //genero api_key    
                     let token = jwt.sign({username: username, password: password}, 'ajabana');
                     req.session.api_key = token;
@@ -154,6 +156,7 @@ module.exports = (app) => {
                     )
                     .then((re) => {
                         let user_id = re.data.data.user_id;
+                        req.session.user_id = user_id;
                         console.log("user_id ottenuto");
                         axios
                             .get(

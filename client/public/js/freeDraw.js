@@ -172,6 +172,42 @@ Vue.component("Vuecanvas", {
             this.context.stroke();
             this.history.push(stroke);
         },
+        saveImage(title) {
+            /*  Per sfondo BIANCO => defualt: trasparente
+                let myData = this.context.getImageData(
+                0,
+                0,
+                this.width,
+                this.height
+            );
+            let data = myData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                if (data[i + 3] < 255) {
+                    data[i] = 255;
+                    data[i + 1] = 255;
+                    data[i + 2] = 255;
+                    data[i + 3] = 255;
+                }
+            }
+            this.context.putImageData(myData, 0, 0);*/
+            this.$refs['v-canvas'].toBlob(blob => {
+                this.sendForm(blob,title);
+            }, 'image/png');
+        },
+        sendForm(blob,title) {
+            //Invia l'immagine al server in formato BLOB, con il relativo titolo
+            console.log(blob);
+            let bodyFormData = new FormData();
+            bodyFormData.append('file', blob, title);
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", 'http://localhost:4000/free_drawing/save', true);
+            xhr.onreadystatechange = function() {
+                if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                    console.log('daje')
+                }
+            }
+            xhr.send(bodyFormData);
+        }
 
         //DRAWER ONLY
     },
@@ -199,20 +235,25 @@ var app = new Vue({
     data: {
         canvas: "",
         palette: "",
+        title: ""
     },
-    beforeMount: function () {
+    mounted() {
         this.canvas = this.$refs["myCanvas"];
     },
     methods: {
-        change() {
-            if (this.canvasMode == "drawer") this.canvasMode = "watch";
-            else this.canvasMode = "drawer";
-            this.canvas = this.$refs["myCanvas"];
-        },
         changeColor(e) {
-            this.canvas = this.$refs["myCanvas"];
             this.canvas.setColor(e.target.value);
             console.log(e.target.value);
         },
+        saveImage() {
+            console.log('triggered');
+            this.canvas.saveImage(this.title);
+        },
+        clear() {
+            this.canvas.clear();
+        },
+        redo() {
+            this.canvas.redraw();
+        }
     },
 });

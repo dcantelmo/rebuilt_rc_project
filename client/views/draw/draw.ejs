@@ -11,33 +11,69 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <link rel="stylesheet" href="/public/css/draw.css">
-
+</head>
 <body>
-    <div class="content">
-        
-        <div id="app" room="<%= ROOM %>" pass="<%= PASSWORD %>" username="<%= USERNAME %>">
-            <Vuewinner :socket="socket"></Vuewinner>
-            <Vueword :socket="socket"></Vueword>
-            <div class="row">
-                <div class="col">
-                    <Vuecanvas v-if="socket" ref="myCanvas" :mode="canvasMode" :key="canvasMode" :socket="socket">
-                    </Vuecanvas>
-                </div>
-                <div class="col">
-                    <Vueusers :socket="socket"></Vueusers>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/"><img src="../../public/assets/logo.png" style="width:75px; height: 40px;"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/room">Multiplayer</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/free_drawing">Free drawing</a>
+                </li>
+            </ul>
+            <a href="/login" class="btn btn-outline-danger my-2 my-sm-0">Logout</a>
+        </div>
+    </nav>
+
+    <div id="app" room="<%= ROOM %>" pass="<%= PASSWORD %>" username="<%= USERNAME %>">
+        <div class="content">
+            <div class="winner">
+                <Vuewinner :socket="socket"></Vuewinner>
+            </div>
+            <div class="first-row">
+                <div class="row">
+                    <div class="col">
+                        <h3>Timer round: {{timer}}</h3>
+                        <Vueword :socket="socket"></Vueword>
+                    </div>
+                    <div class="text-right col align-bottom">
+                        <input type="color" @change="changeColor($event)" pattern="#[0-9A-Fa-f]{6}"
+                            placeholder="Hex Color in this format -> #000000" />
+                        <button class="btn btn-outline-info" @click="change()">{{canvasMode}}</button>
+                        <button class="btn btn-outline-success" v-if="canvasMode == 'drawer'" id='start' @click="start($event)">Start</button>
+                    </div>
                 </div>
             </div>
-            <input type="color" @change="changeColor($event)" pattern="#[0-9A-Fa-f]{6}"
-                placeholder="Hex Color in this format -> #000000" />
-            <button class="btn btn-outline-info" @click="change()">{{canvasMode}}</button>
-            <button class="btn btn-outline-success" v-if="canvasMode == 'drawer'" id='start'
-                @click="start($event)">Start</button>
-            <h4>Timer: {{timer}}</h4>
-            <Vuechat :socket="socket"></Vuechat>
-
+            <div class="row">
+                <div class="sinistra">
+                    <Vueusers :socket="socket"></Vueusers>
+                </div>
+                <div class="centro">
+                    <div class="canvas-wrap">
+                        <Vuecanvas width="700" height="700" v-if="socket" ref="myCanvas" :mode="canvasMode"
+                            :key="canvasMode" :socket="socket" />
+                        </div>
+                    </div>
+                    <div class="destra">
+                        
+                    <Vuechat :socket="socket"></Vuechat>
+                </div>
+            </div>
         </div>
-    </div>
-    <script src="/public/js/draw.js"></script>
+
+</div>
+        <script src="/public/js/draw.js"></script>
 </body>
 
 </html>

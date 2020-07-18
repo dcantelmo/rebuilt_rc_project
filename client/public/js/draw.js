@@ -519,5 +519,13 @@ var app = new Vue({
             this.canvas.setColor(e.target.value);
             console.log(e.target.value);
         },
+        clear() {
+            this.canvas = this.$refs["myCanvas"];
+            this.canvas.clear();
+        },
+        redo() {
+            this.canvas = this.$refs["myCanvas"];
+            this.canvas.redraw();
+        }
     },
 });

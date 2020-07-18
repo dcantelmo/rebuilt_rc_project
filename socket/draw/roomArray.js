@@ -3,7 +3,7 @@ const getRandomWord = require("../../randomWord");
 var rooms = {};
 
 class Room {
-    constructor(id, password, io) {
+    constructor(id, password, io, lang='en') {
         this.id = id;
         this.password = password;
         this.users = [];
@@ -16,7 +16,9 @@ class Room {
         this.empty = false;
         this.word = "prova";
         this.interval = null;
+        this.started = false;
         this.guessed = {};
+        this.lang = lang;
     }
     addUser(user, username) {
         this.users.push({
@@ -88,15 +90,18 @@ class Room {
         this.sendUsers()
     }
     checkWord(userid, word) {
-        if (this.running)
+        if (this.running){
+        console.log(word.trim().toLowerCase(), this.word.trim().toLowerCase());
             if (
                 userid != this.drawer.id &&
                 !this.guessed[userid] &&
-                word.trim().toLowerCase() == this.word
+                word.trim().toLowerCase() == this.word.trim().toLowerCase()
             ) {
                 this.guessed[userid] = true;
                 this.addPoints(userid);
+                this.io.to(userid).emit("word", this.word);
             }
+        }
     }
     sendUsers() {
         console.log("sendingUsers");
@@ -149,17 +154,21 @@ class Room {
         if (!this.running && this.round > 0) {
             getRandomWord
                 .random()
-                .then((word) => (this.word = word))
-                .then(() => {
+                .then((word) => {this.word = word[0]}).then(() => {
+                    if(this.lang != 'en')
+                        return getRandomWord.translate([this.word], this.lang)
+                    .then(tradotto => {console.log('tradotto');this.word = tradotto[0]}).catch((err) => console.log(err))})
+                .then(() => { 
+                    console.log('prima io')
                     this.running = true;
                     console.log(this.word);
                     console.log(this.drawer);
                     this.guessed = {};
                     this.users.forEach((user) => {
                         let data;
-                        if (user.id == this.drawer.id) data = this.word[0];
+                        if (user.id == this.drawer.id) data = this.word;
                         else {
-                            data = "_ ".repeat(this.word[0].length);
+                            data = "_ ".repeat(this.word.length);
                         }
                         this.io.to(user.id).emit("word", data);
                     });
@@ -171,6 +180,7 @@ class Room {
                                 this.running = false;
                                 this.assignDrawer();
                                 clearInterval(this.interval);
+                                this.users.forEach((user) => this.io.to(user.id).emit("word", this.word))
                                 this.roundPause();
                             } else this.timer--;
                             this.io.to(this.id).emit("timerEvent", this.timer);
@@ -184,8 +194,8 @@ class Room {
 
 module.exports = {
     rooms,
-    createRoom(id, password, io) {
-        rooms[id] = new Room(id, password, io);
+    createRoom(id, password, io, lang='en') {
+        rooms[id] = new Room(id, password, io, lang);
         return id;
     },
     checkRoom(id, password) {

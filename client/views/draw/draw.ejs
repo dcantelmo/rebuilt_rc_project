@@ -32,7 +32,7 @@
                     <a class="nav-link" href="/free_drawing">Free drawing</a>
                 </li>
             </ul>
-            <a href="/login" class="btn btn-outline-danger my-2 my-sm-0">Logout</a>
+            <a href="/login/logout" class="btn btn-outline-danger my-2 my-sm-0">Logout</a>
         </div>
     </nav>
 
@@ -48,9 +48,10 @@
                         <Vueword :socket="socket"></Vueword>
                     </div>
                     <div class="text-right col align-bottom">
-                        <input type="color" @change="changeColor($event)" pattern="#[0-9A-Fa-f]{6}"
+                        <input v-if="canvasMode == 'drawer'" type="color" @change="changeColor($event)" pattern="#[0-9A-Fa-f]{6}"
                             placeholder="Hex Color in this format -> #000000" />
-                        <button class="btn btn-outline-info" @click="change()">{{canvasMode}}</button>
+                        <button class="btn btn-outline-warning" v-if="canvasMode == 'drawer'" id='redo' @click="redo()">Indietro</button>
+                        <button class="btn btn-outline-danger" v-if="canvasMode == 'drawer'" id='clear' @click="clear()">Elimina</button>
                         <button class="btn btn-outline-success" v-if="canvasMode == 'drawer'" id='start' @click="start($event)">Start</button>
                     </div>
                 </div>

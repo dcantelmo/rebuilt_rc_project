@@ -190,6 +190,7 @@ Vue.component("Vuecanvas", {
                 }
             }
             this.context.putImageData(myData, 0, 0);*/
+
             this.$refs['v-canvas'].toBlob(blob => {
                 this.sendForm(blob,title);
             }, 'image/png');
@@ -203,7 +204,8 @@ Vue.component("Vuecanvas", {
             xhr.open("POST", 'http://localhost:4000/free_drawing/save', true);
             xhr.onreadystatechange = function() {
                 if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-                    console.log('daje')
+                    alert(`Immagine salvata correttamente`);
+
                 }
             }
             xhr.send(bodyFormData);
@@ -247,7 +249,10 @@ var app = new Vue({
         },
         saveImage() {
             console.log('triggered');
-            this.canvas.saveImage(this.title);
+            if(this.title && !this.title.includes('-'))
+                this.canvas.saveImage(this.title);
+            else
+                alert(`Inserisci un nome valido per l'immagine`)
         },
         clear() {
             this.canvas.clear();

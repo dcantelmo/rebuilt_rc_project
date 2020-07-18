@@ -21,52 +21,55 @@ module.exports = {
             });
         });
     },
-
-    translate(words, req) {
+    
+    translate(words, lang) {
         return new Promise((resolve, reject) => {
-            let text = words.join(",");
+            let text = words.join(", ");
             let result;
             console.log(text);
+            console.log(lang);
+            var req = unirest("POST", "https://microsoft-translator-text.p.rapidapi.com/translate");
 
-            req = unirest(
-                "POST",
-                "https://google-translate1.p.rapidapi.com/language/translate/v2"
-            );
+            req.query({
+                "profanityAction": "NoAction",
+                "textType": "plain",
+                to: lang,
+                "api-version": "3.0"
+            });
 
             req.headers({
-                "x-rapidapi-host": "google-translate1.p.rapidapi.com",
-                "x-rapidapi-key": config.translate_key,
-                "accept-encoding": "application/gzip",
-                "content-type": "application/x-www-form-urlencoded",
+                "x-rapidapi-host": "microsoft-translator-text.p.rapidapi.com",
+                "x-rapidapi-key":
+                    "ff5d49bcd2mshebbaef2c8eaf898p189510jsnad82e1ff01ca",
+                "content-type": "application/json",
+                accept: "application/json",
                 useQueryString: true,
             });
 
-            req.form({
-                source: "en",
-                q: text,
-                target: "it",
-                format: "text",
-            });
+            req.type("json");
+            req.send([
+                {
+                    "Text": text
+                }
+            ]);
 
             req.end(function (res) {
                 if (res.error) {
-                    console.log(res.error);
+                    console.log(res.error.status);
                     reject();
                 } else {
-                    result = res.body.data.translations[0].translatedText;
-                    result = result.split(",");
-
-                    //let result="ajabana,cicciobello,la cantina,il libro,la scuola,locapo,lo scaldabagno,malo sogno";
-                    result = result.replace(/,il /g, ",");
-                    result = result.replace(/,lo /g, ",");
-                    result = result.replace(/,la /g, ",");
-                    result = result.replace(/,i /g, ",");
-                    result = result.replace(/,gli /g, ",");
-                    result = result.replace(/,le /g, ",");
-                    result = result.split(",");
+                    result = res.body[0].translations[0].text;/*
+                    result = result.replace(/, il /g, ", ");
+                    result = result.replace(/, lo /g, ", ");
+                    result = result.replace(/, la /g, ", ");
+                    result = result.replace(/, i /g, ", ");
+                    result = result.replace(/, gli /g, ", ");
+                    result = result.replace(/, le /g, ", ");*/
+                    result = result.split(", ");
                     resolve(result);
                 }
             });
         });
     },
 };
+

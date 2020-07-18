@@ -34,13 +34,13 @@ module.exports = (app) => {
     });
 
     router.post("/draw", (req, res) => {
-        /*
         if(!req.session.api_key && !req.session.token){ 
             res.redirect("/login");
             return;
-        }*/
+        }
 
         if (req.body) {
+            console.log(req.body.lang);
             if (checkRoom(req.body.id, req.body.password) == "ok"){
                 res.render("draw/draw", {
                     ROOM: req.body.id,
@@ -51,7 +51,7 @@ module.exports = (app) => {
             else if (checkRoom(req.body.id, req.body.password) == "password") {
                 res.redirect(`/room?err=password&roomName=${req.body.id}`);
             } else {
-                createRoom(req.body.id, req.body.password, io);
+                createRoom(req.body.id, req.body.password, io, req.body.lang);
                 res.render("draw/draw", {
                     ROOM: req.body.id,
                     PASSWORD: req.body.password,

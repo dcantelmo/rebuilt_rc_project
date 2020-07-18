@@ -59,7 +59,7 @@
                     <a class="nav-link" href="/free_drawing">Free drawing</a>
                 </li>
             </ul>
-            <a href="/login" class="btn btn-outline-success my-2 my-sm-0">Login</a>
+            <a href="/login/logout" class="btn btn-outline-danger my-2 my-sm-0">Logout</a>
         </div>
     </nav>
     
@@ -85,7 +85,7 @@
 
             <div class="row">
 
-                <div class="input-group col-5">
+                <div class="input-group col-4">
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="basic-addon1"><svg width="1.3em" height="1.3em"
                                 viewBox="0 0 16 16" class="bi bi-pencil" fill="currentColor"
@@ -99,7 +99,7 @@
                     <input class="form-control" type="text" size="20" maxlength="10" name="id"
                         placeholder="Nome della stanza" />
                 </div>
-                <div class="input-group col-5">
+                <div class="input-group col-4">
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="basic-addon1"><svg width="1.3em" height="1.3em"
                                 viewBox="0 0 16 16" class="bi bi-shield-lock" fill="currentColor"
@@ -115,7 +115,13 @@
                         placeholder="Password della stanza" />
                     </div>
                     
-                    <div class="col-2">
+                    <div class="col-4">
+                        <select class="custom-select my-select" name="lang" id="lang">
+                            <option value="it">Italiano</option>
+                            <option value="en">Inglese</option>
+                            <option value="es">Spagnolo</option>
+                            <option value="de">Tedesco</option>
+                          </select>
                         <input class="btn btn-outline-primary" type="submit" value="Entra" />
                     </div>
                 </div>

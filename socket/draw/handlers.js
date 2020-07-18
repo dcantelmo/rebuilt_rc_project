@@ -40,8 +40,10 @@ module.exports = (io) => {
 
         socket.on("startGame", () => {
             console.log(`Avvio game in room: ${socket.room}`);
-            if(socket.room && rooms[socket.room])
+            if(socket.room && rooms[socket.room] && !rooms[socket.room].started){
+                rooms[socket.room].started = true;
                 rooms[socket.room].start();
+            }
         });
 
         socket.on("disconnect", () => {
@@ -63,11 +65,11 @@ module.exports = (io) => {
 
         //CHAT AREA
 
-        socket.on("message", (data) => {
-            if (socket.room && rooms[socket.room] && data == rooms[socket.room].word) {
+        socket.on("message", (data) => { 
+            if (socket.room && rooms[socket.room] && data.trim().toLowerCase() == rooms[socket.room].word.trim().toLowerCase()) {
                 rooms[socket.room].checkWord(socket.id, data);
-                return
-            }
+                return;
+            } 
 
             let package = {
                 user: socket.username,

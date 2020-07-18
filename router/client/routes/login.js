@@ -75,7 +75,7 @@ module.exports = (app) => {
         const password = req.body.password;
         couch.get(config.db_database_name, config.db_document).then(
             function (data, headers, status) {
-                if (data.data.users.hasOwnProperty(username)) {
+                if (data.data.users.hasOwnProperty(username) || username.indexOf('-') >= 0) {
                     res.render("login/login", {
                         errLoginUsername: "display:none;",
                         errLoginPassword: "display:none;",

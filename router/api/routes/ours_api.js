@@ -20,32 +20,45 @@ const router = Router();
 module.exports = (app) => {
     app.use("/", router);
 
-    router.get("/", (req, res) => {
-        res.send("yuuuiii");
-    });
-
     router.get("/getRandomWord", (req, res) => {
         //parametri: num, lang
         let number = parseInt(req.query.num) || 1;
-        if (req.query.lang != "en") {
-            let language = req.query.lang;
-            getWord
-                .random(number)
-                .then((parole) => {
-                    getWord.translate(parole, language).then((result) => {
-                        res.send(result);
-                    }).catch((err) => console.log(err));
-                })
-                .catch(() => console.log("err"));
+        let language = req.query.lang || 'en';
+
+        if(['en', 'it', 'de', 'es'].includes(language)){
+            if (language != "en") {
+                getWord
+                    .random(number)
+                    .then((parole) => {
+                        getWord
+                            .translate(parole, language)
+                            .then((result) => {
+                                res.status(200).send(result);
+                            })
+                            .catch((err) => res.sendStatus(400));
+                    })
+                    .catch(() => res.sendStatus(400));
             //{ res.send(getWord.translate(parole, req))})
         } else {
-            getWord.random(number).then((words) => {
-                res.send(words);
-            });
+            getWord
+                .random(number)
+                .then((words) => {
+                    res.status(200).send(words);
+                })
+                .catch((err) => res.sendStatus(400));
+        }
+        }
+        else{
+            res.sendStatus(400)
         }
     });
-
+    
     router.get("/getImage", (req, res) => {
+        //parametri: api_key, name
+        if(!req.query.name){
+            res.sendStatus(400);
+            return;
+        }
         if (req.query.api_key) {
             console.log(req.query.api_key);
             let api_key = req.query.api_key;

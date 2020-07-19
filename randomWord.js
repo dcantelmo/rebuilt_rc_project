@@ -26,8 +26,6 @@ module.exports = {
         return new Promise((resolve, reject) => {
             let text = words.join(", ");
             let result;
-            console.log(text);
-            console.log(lang);
             var req = unirest("POST", "https://microsoft-translator-text.p.rapidapi.com/translate");
 
             req.query({

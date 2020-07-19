@@ -6,8 +6,8 @@ const cookieParser = require("cookie-parser");
 const cors = require('cors');
 const routesApi = require('../router/api');
 const routesClient = require("../router/client");
-
-
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require('../swagger.json');
 const config = require('../config');
 
 module.exports = (app) => {
@@ -35,6 +35,8 @@ module.exports = (app) => {
             extended: false,
         })
     );
+
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use(config.api.prefix, routesApi());
 

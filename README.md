@@ -6,7 +6,7 @@ Pinturicchio è un gioco multiplayer dove i giocatori competono per indovinare c
 - Gioco multiplayer in differenti lingue offerte tramite Microsoft Azure Translator API
 - Disegno libero single-player e possibilità di salvare il disegno creato
 - Possibilità di login automatico tramite Facebook Oauth
-- API REST per recupero di immagini salvate (tramite api_key fornita) e generazione parole casuali in diverse lingue
+- **API** REST per recupero di **immagini salvate** (tramite api_key fornita) e **generazione parole** casuali in diverse lingue
 
 Il gioco è strutturato su un **server NodeJS** che ne controlla i comportamenti e gestisce gli **eventi asincroni** dei giocatori come l'invio dei messaggio in chat, l'invio dei tratti del disegno, i timer ed altro.
 Nella pratica utilizza la **libreria Socket.io** (basato sullo schema publisher/subscriber) per l'inoltro degli eventi da client a server e viceversa.

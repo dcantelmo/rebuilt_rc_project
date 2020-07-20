@@ -22,9 +22,11 @@ Vue.component("Vuecanvas", {
             selectedColor: "",
             lineWidth: Number,
             currentOperation: "",
+            host: "",
         };
     },
     mounted() {
+        this.host = this.$el.attributes["host"].value;
         this.setCanvas();
         this.bindEvents();
     },
@@ -201,7 +203,7 @@ Vue.component("Vuecanvas", {
             let bodyFormData = new FormData();
             bodyFormData.append('file', blob, title);
             let xhr = new XMLHttpRequest();
-            xhr.open("POST", 'http://localhost:4000/free_drawing/save', true);
+            xhr.open("POST", `${this.host}/free_drawing/save`, true);
             xhr.onreadystatechange = function() {
                 if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
                     alert(`Immagine salvata correttamente`);

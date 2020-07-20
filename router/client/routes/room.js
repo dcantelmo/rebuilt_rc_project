@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const router = Router();
+const config = require('../../../config')
 const {
     createRoom,
     checkRoom,
@@ -45,7 +46,9 @@ module.exports = (app) => {
                 res.render("draw/draw", {
                     ROOM: req.body.id,
                     PASSWORD: req.body.password,
-                    USERNAME: req.session.username
+                    USERNAME: req.session.username,
+                    //HOST: `http://${config.serverURI}:${config.port}`,
+                    HOST: config.external_uri,
                 });
             }
             else if (checkRoom(req.body.id, req.body.password) == "password") {
@@ -55,7 +58,9 @@ module.exports = (app) => {
                 res.render("draw/draw", {
                     ROOM: req.body.id,
                     PASSWORD: req.body.password,
-                    USERNAME: req.session.username
+                    USERNAME: req.session.username,
+                    //HOST: `http://${config.serverURI}:${config.port}`,
+                    HOST: config.external_uri,
                 });
             }
         } else res.sendStatus(400);

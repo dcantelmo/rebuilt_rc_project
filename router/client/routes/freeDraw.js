@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const router = Router();
 const multer = require('multer');
+const config = require('../../../config')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -35,7 +36,9 @@ module.exports = (app) => {
             res.render("errore");
         }
         else {
-            res.render("free_drawing/freeDraw",{
+
+            res.render("free_drawing/freeDraw", {
+                HOST: config.external_uri,
             });
         }
     });

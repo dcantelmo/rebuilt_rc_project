@@ -361,7 +361,7 @@ Vue.component("Vuechat", {
     template: `<div>
             <div class="message-box" id="messageBox">
                 <div v-for="(message, index) in messages" :key="index" class="message">
-                    {{message.user}}: {{message.text}}
+                    <b>{{message.user}}</b>: {{message.text}}
                 </div>
             </div>
             <input type="text" @keydown="send($event)"/>
@@ -470,13 +470,16 @@ var app = new Vue({
         match_start: false,
         canvas: "",
         palette: "",
+        host: "",
     },
     beforeMount: function () {
         this.room = this.$el.attributes["room"].value;
         this.pass = this.$el.attributes["pass"].value;
         this.username = this.$el.attributes["username"].value;
+        this.host = this.$el.attributes["host"].value;
         this.canvas = this.$refs["myCanvas"];
-        this.socket = io("http://localhost:4000");
+        console.log(this.host);
+        this.socket = io(this.host);
     },
     mounted() {
         let data = {
@@ -485,7 +488,7 @@ var app = new Vue({
             username: this.username,
         };
         this.socket.on("notExists", () => {
-            window.location.replace("http://localhost:4000/room");
+            window.location.replace(this.host + "/room");
         });
         this.socket.on(
             "timerEvent",

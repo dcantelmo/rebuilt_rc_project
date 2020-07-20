@@ -7,6 +7,10 @@ body{
     margin-right: 5vw;
     width:90vw;
 }
+.tools{
+    width: calc(15vw + 500px);
+    float: right;
+}
 .winner{
     height: 5vh;
 }
@@ -15,11 +19,12 @@ body{
     position:bottom !important;
 }
 .canvas-wrap{
+    height: 502px;
     background-color: rgba(255, 255, 255, 0.7);
 }
 
 .first-row{
-    margin-left: calc(15vw + calc((45vw - 700px)/2));    
+    margin-left: calc(15vw + calc((45vw - 500px)/2));    
     height: 95px !important;
     width: 687px;
 }
@@ -30,8 +35,10 @@ body{
     width:30vw;
 }
 .centro{
-    margin-left: calc((45vw - 700px)/2);
-    margin-right: calc((45vw - 700px)/2);
+    margin-left: calc((45vw - 500px)/2);
+    margin-right: calc((45vw - 500px)/2);
+    display: flex;
+    flex-direction: column;
 }
 
 .message-box{

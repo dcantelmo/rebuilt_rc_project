@@ -4,7 +4,6 @@ const db = require("node-couchdb");
 const jwt = require('jsonwebtoken');
 const router = Router();
 const axios = require("axios");
-const middleware = require("../../middleware");
 
 const couch = new db({
     auth: {
@@ -110,7 +109,7 @@ module.exports = (app) => {
     });
 
     router.get("/oauth", (req, res) => {
-        //chiedo access code a facebook (che lo manda su redirect_uri)
+        /*reindirizzamento a facebook per ottenere l'autorizzazione e il code (sulla redirect_uri) */
         res.redirect(
             "https://www.facebook.com/v7.0/dialog/oauth?client_id=" +
                 config.fb_client_id +
@@ -122,7 +121,6 @@ module.exports = (app) => {
         );
     });
 
-    /*reindirizzamento a facebook per ottenere l'autorizzazione e il code (sulla redirect_uri) */
     router.get("/oauth/token", (req, res) => {
         let code = req.query.code;
         let access_token;
@@ -141,7 +139,7 @@ module.exports = (app) => {
             )
             .then((response) => {
                 access_token = response.data.access_token;
-
+                //salvataggio dell'access token nella sessione
                 console.log("Token client ottenuto");
                 req.session.token = access_token;
 
@@ -149,7 +147,7 @@ module.exports = (app) => {
                 let appToken =
                     config.fb_client_id + "|" + config.fb_client_secret;
                     
-                //controllo token client tramite token app
+                //verifica token client tramite token app per ottenere l'user_id
                 axios
                     .get(
                         `https://graph.facebook.com/debug_token?input_token=${access_token}&access_token=${appToken}`
@@ -158,6 +156,7 @@ module.exports = (app) => {
                         let user_id = re.data.data.user_id;
                         req.session.user_id = user_id;
                         console.log("user_id ottenuto");
+                        //get a facebook per ottenere i dati dell'utente (nome e cognome)
                         axios
                             .get(
                                 `https://graph.facebook.com/${user_id}?fields=id,name&access_token=${access_token}`
@@ -167,7 +166,7 @@ module.exports = (app) => {
                                 const token = access_token;
 
                                 req.session.username = username;
-
+                                //salviamo l'utente sul database o lo aggiorniamo qualora abbia cambiato il nome su facebook
                                 couch
                                     .get(
                                         config.db_database_name,
@@ -177,6 +176,7 @@ module.exports = (app) => {
                                         function (data, headers, status) {
                                             //non controllo se gia esiste poichè ad ogni login aggiorniamo username e password 
                                             //che potrebbero essere cambiati dall'ultimo login
+                                            //creazione api_key dell'utente usando jwt e salvataggio di questa nella sessione
                                                 let api_key = jwt.sign({user_id: user_id, username: username }, 'ajabana');
                                                 req.session.api_key = api_key;
                                                 data.data.users[user_id] = {
@@ -214,5 +214,3 @@ module.exports = (app) => {
             });
     });
 };
-
-//res.cookie("username",username,{expires: new Date}).send()

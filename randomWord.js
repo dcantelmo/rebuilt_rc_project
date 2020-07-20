@@ -37,8 +37,7 @@ module.exports = {
 
             req.headers({
                 "x-rapidapi-host": "microsoft-translator-text.p.rapidapi.com",
-                "x-rapidapi-key":
-                    "ff5d49bcd2mshebbaef2c8eaf898p189510jsnad82e1ff01ca",
+                "x-rapidapi-key": config.translate_key,
                 "content-type": "application/json",
                 accept: "application/json",
                 useQueryString: true,

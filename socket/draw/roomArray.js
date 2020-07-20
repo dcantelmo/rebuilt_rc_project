@@ -9,7 +9,7 @@ class Room {
         this.users = [];
         this.drawer = null;
         this.io = io;
-        this.timer = 10;
+        this.timer = 15;
         this.round = 1;
         this.running = false;
         this.ended = false;
@@ -41,7 +41,7 @@ class Room {
                 if (user == this.drawer.id) {
                     this.assignDrawer();
                     if (this.drawer.position > 0) this.drawer.position--;
-                    console.log("uscito il disegnatore");
+                    //console.log("uscito il disegnatore");
                 }
                 this.users.splice(i, 1);
                 if (this.users.length <= 0) this.empty = true;
@@ -60,7 +60,7 @@ class Room {
         } else this.empty = true;
 
         this.users.forEach((user) => {
-            console.log(user.id, this.drawer.id);
+            //console.log(user.id, this.drawer.id);
             if (user.id == this.drawer.id)
                 this.io.to(user.id).emit("setMode", "drawer");
             else {
@@ -91,7 +91,7 @@ class Room {
     }
     checkWord(userid, word) {
         if (this.running){
-        console.log(word.trim().toLowerCase(), this.word.trim().toLowerCase());
+        //console.log(word.trim().toLowerCase(), this.word.trim().toLowerCase());
             if (
                 userid != this.drawer.id &&
                 !this.guessed[userid] &&
@@ -104,7 +104,7 @@ class Room {
         }
     }
     sendUsers() {
-        console.log("sendingUsers");
+        //console.log("sendingUsers");
         let data = {
             users: this.users,
             drawer: this.drawer.id,
@@ -126,7 +126,7 @@ class Room {
         );
     }
     gamePause() {
-        var gameTimer = 15;
+        var gameTimer = 5;
         var gameInterval = setInterval(
             (() => {
                 if (gameTimer <= 0) {
@@ -147,7 +147,7 @@ class Room {
     start() {
         if (this.ended) {
             this.io.to(this.id).emit("winner", this.getWinner());
-            console.log("vincitore: ", this.getWinner());
+            //console.log("vincitore: ", this.getWinner());
             this.gamePause();
             return;
         }
@@ -157,12 +157,13 @@ class Room {
                 .then((word) => {this.word = word[0]}).then(() => {
                     if(this.lang != 'en')
                         return getRandomWord.translate([this.word], this.lang)
-                    .then(tradotto => {console.log('tradotto');this.word = tradotto[0]}).catch((err) => console.log(err))})
+                    .then(tradotto => {//console.log('tradotto');
+                                        this.word = tradotto[0]}).catch((err) => console.log(err))})
                 .then(() => { 
-                    console.log('prima io')
+                    //console.log('prima io')
                     this.running = true;
-                    console.log(this.word);
-                    console.log(this.drawer);
+                    //console.log(this.word);
+                    //console.log(this.drawer);
                     this.guessed = {};
                     this.users.forEach((user) => {
                         let data;
@@ -176,7 +177,7 @@ class Room {
                     this.interval = setInterval(
                         (() => {
                             if (this.timer <= 0) {
-                                this.timer = 10;
+                                this.timer = 15;
                                 this.running = false;
                                 this.assignDrawer();
                                 clearInterval(this.interval);

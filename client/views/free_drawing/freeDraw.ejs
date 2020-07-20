@@ -9,6 +9,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/public/css/freeDraw.css">
+    <title>Free Drawing</title>
 </head>
 
 <body>
@@ -37,7 +38,7 @@
     <div id="app">
         <div class="content">
             <div class="canvasWrap">
-                <Vuecanvas ref="myCanvas" width="1000" height="700"></Vuecanvas>
+                <Vuecanvas ref="myCanvas" width="1000" height="700" host="<%= HOST %>" ></Vuecanvas>
             </div>
             <div class="row">
                 <div class="input-group col-6">

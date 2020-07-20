@@ -35,9 +35,10 @@ Al momento dell'iscrizione viene generato un token tramite JWT per consentire l'
     DB_PASSWORD= //password di accesso a CouchDB
     DB_DATABASE_NAME= //Nome del DB creato
     DB_DOC_ID= //Id del file presente nel DB creato
-
+    serverURI="localhost" //cambiare se necessario
+    port="4000" //cambiare se necessario
     FB_CLIENT_ID= //ID dell'applicazione registrata su Facebook for Developers
-    FB_REDIRECT_URI='http://localhost:4000/login/oauth/token'
+    FB_REDIRECT_URI='/login/oauth/token'
     FB_STATE='{st=state123abc,ds=123456789}'
     FB_CLIENT_SECRET=//Client secret dell'applicazione registrata su Facebook for Developers
 

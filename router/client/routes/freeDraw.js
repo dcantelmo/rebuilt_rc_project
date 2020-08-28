@@ -53,4 +53,3 @@ module.exports = (app) => {
             res.sendStatus(400);
     });
 };
-
